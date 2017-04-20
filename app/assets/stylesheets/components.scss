@@ -876,6 +876,7 @@ a.status__content__spoiler-link {
   }
 
   .column, .drawer {
+    width : 25% ;
     flex: 0 0 auto;
     padding: 10px;
     padding-left: 5px;
@@ -897,7 +898,7 @@ a.status__content__spoiler-link {
   }
 
   .column, .drawer {
-    width: 350px;
+    width: 25%;
     border-radius: 4px;
     height: 90vh;
     margin-top: 5vh;
