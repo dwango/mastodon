@@ -23,7 +23,11 @@
           %span= t 'about.domain_count_before'
           %strong= number_with_delimiter @instance_presenter.domain_count
           %span= t 'about.domain_count_after'
-
+      .information-board
+        .section
+          %span ニコニコ連携済み
+          %strong= number_with_delimiter @instance_presenter.niconico_associated_count
+          %span= t 'about.user_count_after'
       - unless @instance_presenter.site_extended_description.blank?
         .panel= @instance_presenter.site_extended_description.html_safe
 
