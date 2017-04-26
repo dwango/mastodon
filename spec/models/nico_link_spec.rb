@@ -11,17 +11,27 @@ RSpec.describe NicoLink, type: :model do
         expect(subject.match('im9#11:10')).to_not be_nil
         expect(subject.match('im0009#11:10')).to_not be_nil
 
+        expect(subject.match('mg9#11:10')).to_not be_nil
+        expect(subject.match('mg0009#11:10')).to_not be_nil
+
         expect(subject.match('lv9#11:10')).to_not be_nil
         expect(subject.match('lv0009#11:10')).to_not be_nil
 
         expect(subject.match('sm9#11:10')).to_not be_nil
         expect(subject.match('sm0009#11:10')).to_not be_nil
+
+        expect(subject.match('gm9#11:10')).to_not be_nil
+        expect(subject.match('gm0009#11:10')).to_not be_nil
       end
 
       it 'matches nicolinks within Japanese text' do
         expect(subject.match('このim9#11:10が好き')).to_not be_nil
         expect(subject.match('つim90923#11:10は観たこと無いな')).to_not be_nil
         expect(subject.match('あim9#11:10９')).to_not be_nil
+
+        expect(subject.match('このmg9#11:10が好き')).to_not be_nil
+        expect(subject.match('つmg90923#11:10は観たこと無いな')).to_not be_nil
+        expect(subject.match('あmg9#11:10９')).to_not be_nil
 
         expect(subject.match('このlv9#11:10が好き')).to_not be_nil
         expect(subject.match('つlv90923#11:10は観たこと無いな')).to_not be_nil
@@ -30,6 +40,10 @@ RSpec.describe NicoLink, type: :model do
         expect(subject.match('このsm9#11:10が好き')).to_not be_nil
         expect(subject.match('つsm90923#11:10は観たこと無いな')).to_not be_nil
         expect(subject.match('あsm9#11:10９')).to_not be_nil
+
+        expect(subject.match('このgm9#11:10が好き')).to_not be_nil
+        expect(subject.match('つgm90923#11:10は観たこと無いな')).to_not be_nil
+        expect(subject.match('あgm9#11:10９')).to_not be_nil
       end
     end
 
@@ -38,17 +52,27 @@ RSpec.describe NicoLink, type: :model do
         expect(subject.match('im9')).to_not be_nil
         expect(subject.match('im0009')).to_not be_nil
 
+        expect(subject.match('mg9')).to_not be_nil
+        expect(subject.match('mg0009')).to_not be_nil
+
         expect(subject.match('lv9')).to_not be_nil
         expect(subject.match('lv0009')).to_not be_nil
 
         expect(subject.match('sm9')).to_not be_nil
         expect(subject.match('sm0009')).to_not be_nil
+
+        expect(subject.match('gm9')).to_not be_nil
+        expect(subject.match('gm0009')).to_not be_nil
       end
 
       it 'matches nicolinks within Japanese text' do
         expect(subject.match('このim9が好き')).to_not be_nil
         expect(subject.match('つim90923は観たこと無いな')).to_not be_nil
         expect(subject.match('あim9９')).to_not be_nil
+
+        expect(subject.match('このmg9が好き')).to_not be_nil
+        expect(subject.match('つmg90923は観たこと無いな')).to_not be_nil
+        expect(subject.match('あmg9９')).to_not be_nil
 
         expect(subject.match('このlv9が好き')).to_not be_nil
         expect(subject.match('つlv90923は観たこと無いな')).to_not be_nil
@@ -57,6 +81,10 @@ RSpec.describe NicoLink, type: :model do
         expect(subject.match('このsm9が好き')).to_not be_nil
         expect(subject.match('つsm90923は観たこと無いな')).to_not be_nil
         expect(subject.match('あsm9９')).to_not be_nil
+
+        expect(subject.match('このgm9が好き')).to_not be_nil
+        expect(subject.match('つgm90923は観たこと無いな')).to_not be_nil
+        expect(subject.match('あgm9９')).to_not be_nil
       end
     end
 
@@ -85,6 +113,7 @@ RSpec.describe NicoLink, type: :model do
       it 'does not add from param for non-temporal ids' do
         subject.each do |key, _|
           expect(NicoLink.new('im0139401923849', key).to_href).to eq 'https://nico.ms/im0139401923849'
+          expect(NicoLink.new('gm139401923849', key).to_href).to eq 'https://game.nicovideo.jp/atsumaru/games/gm139401923849'
         end
       end
 
@@ -124,13 +153,17 @@ RSpec.describe NicoLink, type: :model do
 
     context 'without time' do
       let(:im) { NicoLink.new('im0139401923849') }
+      let(:im) { NicoLink.new('mg0139401923849') }      
       let(:lv) { NicoLink.new('lv84120982743') }
       let(:sm) { NicoLink.new('sm9') }
+      let(:gm) { NicoLink.new('gm3') }
 
       it 'returns a proper href' do
         expect(im.to_href).to eq 'https://nico.ms/im0139401923849'
+        expect(mg.to_href).to eq 'https://nico.ms/mg0139401923849'
         expect(lv.to_href).to eq 'https://nico.ms/lv84120982743'
         expect(sm.to_href).to eq 'https://nico.ms/sm9'
+        expect(gm.to_href).to eq 'https://game.nicovideo.jp/atsumaru/games/gm3'
       end
     end
   end
@@ -160,6 +193,20 @@ RSpec.describe NicoLink, type: :model do
         a << 'あim9'
         a << 'im9９'
         a << 'あim9９'
+
+        a << 'mg9'
+        a << ' mg9'
+        a << '　mg9'
+        a << 'あmg9'
+        a << 'mg9９'
+        a << 'あmg9９'
+
+        a << 'gm9'
+        a << ' gm9'
+        a << '　gm9'
+        a << 'あgm9'
+        a << 'gm9９'
+        a << 'あgm9９'
 
         a.map { |s| NicoLink.parse s }
       end
