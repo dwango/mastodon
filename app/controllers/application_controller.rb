@@ -27,6 +27,7 @@ class ApplicationController < ActionController::Base
   private
 
   def store_current_location
+    return if about_url.include?(request.url) && !user_signed_in?
     store_location_for(:user, request.url)
   end
 

@@ -10,10 +10,17 @@ class Auth::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       end
 
       if current_user
-        redirect_to root_path
+        redirect_to after_sign_in_path_for(current_user)
       else
         redirect_to new_user_registration_path
       end
     end
+  end
+
+  private
+
+  def after_sign_in_path_for(_resource)
+    last_url = stored_location_for(:user)
+    [about_path].include?(last_url) ? root_path : last_url || root_path
   end
 end
