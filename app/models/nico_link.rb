@@ -13,6 +13,7 @@ class NicoLink
   NON_TEMPORAL_TYPES = %w[
     im
     gm
+    mg
   ].freeze
 
   NICO_ID_RE = %r{(#{[].concat(TEMPORAL_TYPES, NON_TEMPORAL_TYPES).join('|')})(\d+)}
