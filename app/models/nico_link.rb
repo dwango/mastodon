@@ -2,6 +2,7 @@
 
 class NicoLink
   BASE_URI = URI.parse('https://nico.ms')
+  RPG_ATSUMARU_GAME_PAGE_BASE_URI = URI.parse('https://game.nicovideo.jp/atsumaru/games/')
 
   TEMPORAL_TYPES = %w[
     lv
@@ -11,6 +12,7 @@ class NicoLink
 
   NON_TEMPORAL_TYPES = %w[
     im
+    gm
   ].freeze
 
   NICO_ID_RE = %r{(#{[].concat(TEMPORAL_TYPES, NON_TEMPORAL_TYPES).join('|')})(\d+)}
@@ -37,7 +39,11 @@ class NicoLink
   end
 
   def to_href
-    href = BASE_URI + @nico_id
+    if @type == "gm" then
+      href = RPG_ATSUMARU_GAME_PAGE_BASE_URI + @nico_id
+    else
+      href = BASE_URI + @nico_id
+    end
     href.query = URI.encode_www_form(from: @from_sec) if time?
     href.normalize.to_s
   end
