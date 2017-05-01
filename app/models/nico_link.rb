@@ -47,7 +47,7 @@ class NicoLink
   def process_time(time)
     time = time.to_s
     return unless temporal?
-    return unless TIME_RE_FULLSTR.match?(time)
+    return unless TIME_RE_FULLSTR.match(time)
 
     min, sec = time.split(':').map(&:to_i)
     sec += min * 60
