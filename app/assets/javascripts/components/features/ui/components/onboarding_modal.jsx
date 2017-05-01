@@ -47,6 +47,7 @@ const PageTwo = () => (
         onSubmit={() => {}}
         onPaste={() => {}}
         onPickEmoji={() => {}}
+        onNicoru={() => {}}
         onChangeSpoilerText={() => {}}
         onClearSuggestions={() => {}}
         onFetchSuggestions={() => {}}

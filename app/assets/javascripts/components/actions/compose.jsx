@@ -31,6 +31,7 @@ export const COMPOSE_VISIBILITY_CHANGE  = 'COMPOSE_VISIBILITY_CHANGE';
 export const COMPOSE_LISTABILITY_CHANGE = 'COMPOSE_LISTABILITY_CHANGE';
 
 export const COMPOSE_EMOJI_INSERT = 'COMPOSE_EMOJI_INSERT';
+export const COMPOSE_NICORU_INSERT = 'COMPOSE_NICORU_INSERT';
 
 export function changeCompose(text) {
   return {
@@ -276,5 +277,12 @@ export function insertEmojiCompose(position, emoji) {
     type: COMPOSE_EMOJI_INSERT,
     position,
     emoji
+  };
+};
+
+export function insertNicoruCompose(position) {
+  return {
+    type: COMPOSE_NICORU_INSERT,
+    position
   };
 };

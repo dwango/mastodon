@@ -46,7 +46,8 @@ const ComposeForm = React.createClass({
     onSuggestionSelected: React.PropTypes.func.isRequired,
     onChangeSpoilerText: React.PropTypes.func.isRequired,
     onPaste: React.PropTypes.func.isRequired,
-    onPickEmoji: React.PropTypes.func.isRequired
+    onPickEmoji: React.PropTypes.func.isRequired,
+    onNicoru: React.PropTypes.func.isRequired,
   },
 
   mixins: [PureRenderMixin],
@@ -128,6 +129,13 @@ const ComposeForm = React.createClass({
     this.props.onPickEmoji(position, data);
   },
 
+  handleNicoru (event) {
+    event.preventDefault();
+    const position     = this.autosuggestTextarea.textarea.selectionStart;
+    this._restoreCaret = position + ":nicoru:".length + 1;
+    this.props.onNicoru(position);
+  },
+
   render () {
     const { intl, needsPrivacyWarning, mentionedDomains, onPaste } = this.props;
     const disabled = this.props.is_submitting;
@@ -182,6 +190,12 @@ const ComposeForm = React.createClass({
           />
 
           <EmojiPickerDropdown onPickEmoji={this.handleEmojiPick} />
+
+          <div style={{position: 'absolute', right: '7px', top: '35px'}}>
+            <a href="#nicoru" className='emoji-button' onClick={this.handleNicoru}>
+              <img src={NicoruImages.main} />
+            </a>
+          </div>
         </div>
 
         <div className='compose-form__modifiers'>
