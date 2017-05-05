@@ -12,7 +12,7 @@ class NicoLink
   TIME_RE = %r{\d{1,2}:[0-5]\d}
   TIME_RE_FULLSTR = %r{\A#{TIME_RE}\z}
 
-  NICOLINK_RE = %r{(?<prefix>^|[^\/\)\w])(?<nico_id>#{NICO_ID_RE})(#(?<time>#{TIME_RE}))?}
+  NICOLINK_RE = %r{(?<prefix>^|[^\/\)\#\w])(?<nico_id>#{NICO_ID_RE})(#(?<time>#{TIME_RE}))?}
 
   def self.parse(nicolink)
     m = NICOLINK_RE.match(nicolink)
