@@ -7,6 +7,8 @@ RSpec.describe Formatter do
   let(:remote_status) { Fabricate(:status, text: '<script>alert("Hello")</script> Beep boop', uri: 'beepboop', account: account) }
   let(:nicolink_status) { Fabricate(:status, text: 'Hello world sm9', account: account) }
   let(:temporal_nicolink_status) { Fabricate(:status, text: 'Hello world sm9#1:30', account: account) }
+  let(:hashtag_nicolink_status) { Fabricate(:status, text: 'Hello world #sm9', account: account) }
+  let(:hashtag_temporal_nicolink_status) { Fabricate(:status, text: 'Hello world #sm9#1:30', account: account) }
 
   describe '#format' do
     subject { Formatter.instance.format(local_status) }
@@ -36,6 +38,22 @@ RSpec.describe Formatter do
 
       it 'contains a link to sm9 with correct seconds and text' do
         expect(subject).to match('Hello world <a href="https://nico.ms/sm9\?from=90" rel="nofollow noopener" target="_blank"><span>sm9#1:30</span></a>')
+      end
+    end
+
+    describe 'hashtag nicolink format' do
+      subject { Formatter.instance.format(hashtag_nicolink_status) }
+
+      it 'contains no link to #sm9' do
+        expect(subject).to match('<p>Hello world <a href="https://cb6e6126.ngrok.io/tags/sm9" class="mention hashtag">#<span>sm9</span></a></p>')
+      end
+    end
+
+    describe 'hashtag temporal nicolink format' do
+      subject { Formatter.instance.format(hashtag_temporal_nicolink_status) }
+
+      it 'contains no link to sm9 with correct seconds and text' do
+        expect(subject).to match('<p>Hello world <a href="https://cb6e6126.ngrok.io/tags/sm9" class="mention hashtag">#<span>sm9</span></a>#1:30</p>')
       end
     end
 
