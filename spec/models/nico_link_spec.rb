@@ -31,6 +31,10 @@ RSpec.describe NicoLink, type: :model do
         expect(subject.match('つsm90923#11:10は観たこと無いな')).to_not be_nil
         expect(subject.match('あsm9#11:10９')).to_not be_nil
       end
+
+      it 'does not match hashtags' do
+        expect(subject.match('#sm9#11:10')).to be_nil
+      end
     end
 
     context 'without time' do
@@ -63,6 +67,10 @@ RSpec.describe NicoLink, type: :model do
     it 'does not match URLs' do
       expect(subject.match('https://example.com/sm9')).to be_nil
       expect(subject.match('https://example.com/Aha_(hello)sm9')).to be_nil
+    end
+
+    it 'does not match hashtags' do
+      expect(subject.match('#sm9')).to be_nil
     end
   end
 
