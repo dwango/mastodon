@@ -1,3 +1,11 @@
+friends.nico
+=======
+
+friends.nicoへようこそ！
+ここは、ニコニコが運営するMastodonインスタンスのオープンソースコードです。
+
+詳しい説明などは[ニコニコ大百科](http://dic.nicovideo.jp/a/friends.nico)にて
+
 Mastodon
 ========
 
