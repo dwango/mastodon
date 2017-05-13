@@ -3,12 +3,14 @@
 class Account < ApplicationRecord
   include Targetable
 
+  word_data = ReservedUsernameList.all
+  VALID_RESERVED_WORDS = word_data.map{ |word| word.word }
   MENTION_RE = /(?:^|[^\/\w])@([a-z0-9_]+(?:@[a-z0-9\.\-]+[a-z0-9]+)?)/i
   IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif'].freeze
 
   # Local users
   has_one :user, inverse_of: :account
-  validates :username, presence: true, format: { with: /\A[a-z0-9_]+\z/i }, uniqueness: { scope: :domain, case_sensitive: false }, length: { maximum: 30 }, if: 'local?'
+  validates :username, presence: true, format: { with: /\A[a-z0-9_]+\z/i }, uniqueness: { scope: :domain, case_sensitive: false }, length: { maximum: 30 }, exclusion: {in: VALID_RESERVED_WORDS}, if: 'local?'
   validates :username, presence: true, uniqueness: { scope: :domain, case_sensitive: true }, unless: 'local?'
 
   # Avatar upload

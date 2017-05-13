@@ -26,19 +26,6 @@ defaults: &defaults
   interactions:
     must_be_follower: false
     must_be_following: false
-  reserved_usernames:
-    - 'admin'
-    - 'administrator'
-    - 'root'
-    - 'master'
-    - 'webmaster'
-    - 'system'
-    - 'owner'
-    - 'register'
-    - 'official'
-    - 'staff'
-    - 'support'
-    - 'help'
 
 development:
   <<: *defaults
