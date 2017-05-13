@@ -5,3 +5,11 @@ if Rails.env.development?
   admin  = Account.where(username: 'admin').first_or_create!(username: 'admin')
   User.where(email: "admin@#{domain}").first_or_initialize(email: "admin@#{domain}", password: 'mastodonadmin', password_confirmation: 'mastodonadmin', confirmed_at: Time.now.utc, admin: true, account: admin).save!
 end
+
+require 'json'
+
+reserved_words = JSON.parse(File.read('db/reserved_username.json'))
+
+reserved_words.each do |word|
+  ReservedUsernameList.create(word: word)
+end
