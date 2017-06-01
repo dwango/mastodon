@@ -24,7 +24,7 @@ class Setting < RailsSettings::Base
         end
       end
 
-      val
+      val || default_settings[key]
     end
 
     def all_as_records
