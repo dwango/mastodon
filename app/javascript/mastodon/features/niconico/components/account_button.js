@@ -1,14 +1,7 @@
 import React from 'react';
-import PureRenderMixin from 'react-addons-pure-render-mixin';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
-const AccountButton = React.createClass({
-
-  propTypes: {
-    account: ImmutablePropTypes.map.isRequired,
-  },
-
-  mixins: [PureRenderMixin],
+class AccountButton extends React.PureComponent {
 
   render() {
     const { account } = this.props;
@@ -24,17 +17,22 @@ const AccountButton = React.createClass({
     }
 
     return (
-      <div className="nico-account-button">
+      <div className='nico-account-button'>
         <a
-          href={nicoUrl}
-          target="_blank"
-          rel="noopener"
+           href={nicoUrl}
+           target='_blank'
+           rel='noopener'
         >
-          <i className="nico-account-button__icon" />
+          <i className='nico-account-button__icon' />
         </a>
       </div>
     );
-  },
-});
+  }
+
+}
+
+AccountButton.propTypes = {
+  account: ImmutablePropTypes.map.isRequired,
+};
 
 export default AccountButton;

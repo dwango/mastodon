@@ -22,7 +22,7 @@ const Announcements = React.createClass({
     return e => {
       if (this.state.nicotta.includes(id))
         return ;
-      this.setState({nicotta: [].concat(this.state.nicotta, id)});
+      this.setState({ nicotta: [].concat(this.state.nicotta, id) });
     };
   },
 
@@ -33,12 +33,14 @@ const Announcements = React.createClass({
         {announcements.map((announcement, idx) => (
           <li key={idx}>
             <div className='announcements__icon'>
-              <IconButton active={nicotta.includes(announcement.get('id'))}
-                          animate={true} icon='nicoru--status'
-                          title='announcement-icon'
-                          onClick={this.handleNicoru(announcement.get('id'))}
-                          activeStyle={{ color: '#ca8f04' }}
-                          />
+              <IconButton
+                 active={nicotta.includes(announcement.get('id'))}
+                 animate
+                 icon='nicoru--status'
+                 title='announcement-icon'
+                 onClick={this.handleNicoru(announcement.get('id'))}
+                 activeStyle={{ color: '#ca8f04' }}
+              />
             </div>
             <div className='announcements__body'>
               <p>{announcement.get('body')}</p>
