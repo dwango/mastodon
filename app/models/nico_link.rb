@@ -3,7 +3,7 @@
 class NicoLink
   BASE_URI = URI.parse('https://nico.ms')
 
-  VIDEO_TYPES = %w(sm so).freeze
+  VIDEO_TYPES = %w(sm so nm).freeze
   LIVE_TYPES  = %w(lv).freeze
   TEMPORAL_TYPES = VIDEO_TYPES + LIVE_TYPES
 
