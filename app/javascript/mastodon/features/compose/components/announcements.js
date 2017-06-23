@@ -12,6 +12,11 @@ const announcements = Immutable.fromJS([
     },
     nicotta: false,
   },
+  {
+    id: 2,
+    body: '利用時のお困りごとなどは @friends_nico へ Mention か DM でご連絡ください',
+    nicotta: false,
+  },
 ]);
 
 const Announcements = React.createClass({
