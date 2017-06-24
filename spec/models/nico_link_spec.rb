@@ -44,6 +44,9 @@ RSpec.describe NicoLink, type: :model do
 
         expect(subject.match('sm9')).to_not be_nil
         expect(subject.match('sm0009')).to_not be_nil
+
+        expect(subject.match('nm9')).to_not be_nil
+        expect(subject.match('nm0009')).to_not be_nil
       end
 
       it 'matches nicolinks within Japanese text' do
@@ -58,6 +61,10 @@ RSpec.describe NicoLink, type: :model do
         expect(subject.match('このsm9が好き')).to_not be_nil
         expect(subject.match('つsm90923は観たこと無いな')).to_not be_nil
         expect(subject.match('あsm9９')).to_not be_nil
+
+        expect(subject.match('このnm9が好き')).to_not be_nil
+        expect(subject.match('つnm90923は観たこと無いな')).to_not be_nil
+        expect(subject.match('あnm9９')).to_not be_nil
       end
     end
     describe 'enabled prefixs' do
