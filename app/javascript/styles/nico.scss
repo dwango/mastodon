@@ -25,6 +25,10 @@ $icon-size--nico--large: 36px;
   display: inline-block;
 }
 
+button.icon-button.active i.fa-nicoru {
+  background-image: url('../images/nicoru.svg');
+}
+
 .fa-nicoru {
   display: inline-block;
   width: 14px;
