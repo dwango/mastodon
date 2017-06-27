@@ -1,5 +1,4 @@
 import React from 'react';
-import LoadingIndicator from '../../../components/loading_indicator';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import ExtendedVideoPlayer from '../../../components/extended_video_player';
@@ -29,7 +28,7 @@ class VideoModal extends ImmutablePureComponent {
       <div className='modal-root__modal media-modal'>
         <div>
           <div className='media-modal__close'><IconButton title={intl.formatMessage(messages.close)} icon='times' overlay onClick={onClose} /></div>
-          <ExtendedVideoPlayer src={url} muted={false} controls={true} time={time} />
+          <ExtendedVideoPlayer src={url} muted={false} controls time={time} />
         </div>
       </div>
     );

@@ -2,7 +2,7 @@ import React from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import DropdownMenu from '../../../components/dropdown_menu';
-import Link from 'react-router/lib/Link';
+import Link from 'react-router-dom/Link';
 import { defineMessages, injectIntl, FormattedMessage, FormattedNumber } from 'react-intl';
 
 const messages = defineMessages({
@@ -81,7 +81,7 @@ class ActionBar extends React.PureComponent {
     return (
       <div className='account__action-bar'>
         <div className='account__action-bar-dropdown'>
-          <DropdownMenu items={menu} icon='bars' size={24} direction="right" />
+          <DropdownMenu items={menu} icon='bars' size={24} direction='right' />
         </div>
 
         <div className='account__action-bar-links'>

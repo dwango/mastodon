@@ -4,10 +4,10 @@ ca:
     about_mastodon: Mastodon és un servidor de xarxa social <em>lliure i de codi obert</em>. Una alternativa <em>descentralitzada</em> a plataformes comercials, que evita el risc que una única companyia monopolitzi la teva comunicació. Qualsevol pot executar Mastodon i participar sense problemes en la <em>xarxa social</em>.
     about_this: Sobre aquesta instància
     apps: Apps
-    business_email: 'Correu de negocis:'
+    business_email: 'Adreça de contacte:'
     closed_registrations: Els registres estan actualment tancats en aquesta instància.
     contact: Contacte
-    description_headline: "Què es %{domain}?"
+    description_headline: Què es %{domain}?
     domain_count_after: altres instàncies
     domain_count_before: Connectat a
     features:
@@ -34,11 +34,12 @@ ca:
     follow: Seguir
     followers: Seguidors
     following: Seguint
-    nothing_here: "No hi ha res aquí!"
+    nothing_here: No hi ha res aquí!
     people_followed_by: Usuaris a qui %{name} segueix
     people_who_follow: Usuaris que segueixn a %{name}
     posts: Toots
     remote_follow: Seguir
+    reserved_username: El nom d'usuari està reservat
     unfollow: Deixar de seguir
   activitypub:
     activity:
@@ -48,7 +49,7 @@ ca:
         name: "%{account_name} created a note."
     outbox:
       name: "%{account_name}'s Outbox"
-      summary: "A collection of activities from user %{account_name}."
+      summary: A collection of activities from user %{account_name}.
   admin:
     accounts:
       are_you_sure: Estàs segur?
@@ -62,6 +63,7 @@ ca:
       feed_url: URL del feed
       followers: Seguidors
       follows: Segueix
+      ip: IP
       location:
         all: Tot
         local: Local
@@ -84,17 +86,23 @@ ca:
       profile_url: URL del perfil
       public: Públic
       push_subscription_expires: La subscripció PuSH expira
+      redownload: Refrescar avatar
+      reset: Reajustar
       reset_password: Restablir la contrasenya
+      resubscribe: Resubscribir
       salmon_url: URL Salmon
+      search: Cerca
       show:
         created_reports: Informes creats per aquest compte
         report: informe
         targeted_reports: Informes realitzats sobre aquest compte
       silence: Silenci
       statuses: Estats
+      subscribe: Subscribir
       title: Comptes
       undo_silenced: Desfer silenci
       undo_suspension: Desfer suspensió
+      unsubscribe: Donar-se de baixa
       username: Nom d'usuari
       web: Web
     domain_blocks:
@@ -118,8 +126,8 @@ ca:
       severity: Severitat
       show:
         affected_accounts:
-          one: Un compte en la base de dades afectat
-          other: "%{count} comptes en la base de dades afectats"
+          one: Un compte afectat en la base de dades
+          other: "%{count} comptes afectats en la base de dades"
         retroactive:
           silence: Desfer el silenci a tots els comptes existents d'aquest domini
           suspend: Desfer la suspensió de tots els comptes d'aquest domini
@@ -131,20 +139,18 @@ ca:
       account_count: Comptes coneguts
       domain_name: Domini
       title: Instàncies conegudes
-    pubsubhubbub:
-      callback_url: Callback URL
-      confirmed: Confirmat
-      expires_in: Expira en
-      last_delivery: Últim lliurament
-      title: PubSubHubbub
-      topic: Tòpic
     reports:
+      action_taken_by: Mesures adoptades per
+      are_you_sure: Estàs segur?
       comment:
         label: Comentari
         none: Cap
       delete: Esborra
       id: ID
       mark_as_resolved: Marca com a resolt
+      nsfw:
+        'false': NSFW OFF
+        'true': NSFW ON
       report: 'Informe #%{id}'
       report_contents: Continguts
       reported_account: Compte reportat
@@ -179,6 +185,13 @@ ca:
         title: Descripció estesa del lloc
       site_title: Títol del lloc
       title: Configuració del lloc
+    subscriptions:
+      callback_url: Callback URL
+      confirmed: Confirmat
+      expires_in: Expira en
+      last_delivery: Últim lliurament
+      title: PubSubHubbub
+      topic: Tòpic
     title: Administració
   application_mailer:
     settings: 'Canviar preferències de correu: %{link}'
@@ -188,8 +201,10 @@ ca:
     invalid_url: La URL proporcionada es incorrecte
   auth:
     change_password: Canviar contrasenya
-    didnt_get_confirmation: "¿No vas rebre el correu de confirmació?"
-    forgot_password: "¿Has oblidat la contrassenya?"
+    delete_account: Esborrar el compte
+    delete_account_html: Si vols esborrar el teu compte pots <a href="%{path}">fer-ho aquí</a>. S'et demanarà confirmació.
+    didnt_get_confirmation: "No vas rebre el correu de confirmació?"
+    forgot_password: "Has oblidat la contrasenya?"
     login: Iniciar sessió
     logout: Tancar sessió
     register: Enregistrarse
@@ -215,6 +230,14 @@ ca:
       x_minutes: "%{count}m"
       x_months: "%{count}m"
       x_seconds: "%{count}s"
+  deletes:
+    bad_password_msg: Bon intent hackers! Contrasenya incorrecta
+    confirm_password: Introdueix la contrasenya actual per verificar la teva identitat
+    description_html: Això eliminarà de forma <strong>irreversible i permanent</strong> el contingut del teu compte i el desactivarà. El teu nom d'usuari romandrà reservat per evitar que algú volgués fer-se passar per tu.
+    proceed: Esborrar el compte
+    success_msg: El teu compte s'ha eliminat correctament
+    warning_html: Només està garantida l'eliminació d'aquesta particular instància. El contingut que ha estat àmpliament compartit que deixi petjades. Els servidors fora de línia i els que ja no estan subscrits no actualitzaran les seves bases de dades.
+    warning_title: Disponibilitat de contingut disseminat
   errors:
     '403': No tens permís per veure aquesta pàgina.
     '404': La pàgina que estàs buscant no existeix.
@@ -223,6 +246,7 @@ ca:
       content: La verificació de seguretat ha fallat. Bloquejes les galetes?
       title: La verificació de seguretat ha fallat
     '429': Estrangulat
+    noscript: Per utilitzar Mastodon si us plau activa JavaScript.
   exports:
     blocks: Persones que has bloquejat
     csv: CSV
@@ -242,12 +266,12 @@ ca:
     unlocked_warning_html: Tothom pot seguir-te per veure inmediatament les teves publicacions privades. %{lock_link} per poder revisar i rebutjar seguidors.
     unlocked_warning_title: El teu compte no està bloquejat
   generic:
-    changes_saved_msg: "Canvis guardats amb èxit!"
+    changes_saved_msg: Canvis guardats amb èxit!
     powered_by: powered by %{link}
     save_changes: Guardar canvis
     validation_errors:
-      one: "Alguna cosa no esta bé! Si us plau, revisi l'error"
-      other: "Alguna cosa no esta bé! Si us plau, revisi %{count} errors més a baix"
+      one: Alguna cosa no esta bé! Si us plau, revisi l'error
+      other: Alguna cosa no esta bé! Si us plau, revisi %{count} errors més a baix
   imports:
     preface: Pots importar algunes dades, com ara totes les persones que estàs seguint o bloquejant, en el teu compte en aquesta instància, desde arxius exportats desde una altra instància.
     success: Dades rebudes correctament i seran processades en breu
@@ -256,7 +280,7 @@ ca:
       following: Llista de seguits
       muting: Llista d'apagats
     upload: Carregar
-  landing_strip_html: <strong>%{name}</strong> és un usuari/a de %{link_to_root_path}. Pots seguir-lo/la o interactuar amb ell/a si tens un compte a qualsevol node del fediverse.
+  landing_strip_html: "<strong>%{name}</strong> és un usuari/a de %{link_to_root_path}. Pots seguir-lo/la o interactuar amb ell/a si tens un compte a qualsevol node del fediverse."
   landing_strip_signup_html: Si no en tens, pots <a href="%{sign_up_path}">registrar-te aquí</a>.
   media_attachments:
     validations:
@@ -267,8 +291,8 @@ ca:
       body: 'Un resum del que et vas perdre en %{instance} desde la teva darrera visita el %{since}:'
       mention: "%{name} t'ha mencionat en:"
       new_followers_summary:
-        one: "Visca!. Algú més t´ha començat a seguir"
-        other: "Genial!. T'han seguit %{count} noves persones"
+        one: Visca!. Algú més t´ha començat a seguir
+        other: Genial!. T'han seguit %{count} noves persones
       subject:
         one: "1 nova notificació desde la teva darrera visita \U0001F418"
         other: "%{count} noves notificacions desde la teva darrera visita \U0001F418"
@@ -299,6 +323,7 @@ ca:
   settings:
     authorized_apps: Aplicacions autoritzades
     back: Tornar al inici
+    delete: Eliminació del compte
     edit_profile: Editar perfil
     export: Exportar informació
     followers: Seguidors autoritzats

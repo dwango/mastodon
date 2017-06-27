@@ -6,25 +6,26 @@ import Toggle from 'react-toggle';
 class SettingToggle extends React.PureComponent {
 
   static propTypes = {
+    prefix: PropTypes.string,
     settings: ImmutablePropTypes.map.isRequired,
     settingKey: PropTypes.array.isRequired,
     label: PropTypes.node.isRequired,
     onChange: PropTypes.func.isRequired,
-    htmlFor: PropTypes.string,
   }
 
-  onChange = (e) => {
-    this.props.onChange(this.props.settingKey, e.target.checked);
+  onChange = ({ target }) => {
+    this.props.onChange(this.props.settingKey, target.checked);
   }
 
   render () {
-    const { settings, settingKey, label, onChange, htmlFor = '' } = this.props;
+    const { prefix, settings, settingKey, label } = this.props;
+    const id = ['setting-toggle', prefix, ...settingKey].filter(Boolean).join('-');
 
     return (
-      <label htmlFor={htmlFor} className='setting-toggle__label'>
-        <Toggle checked={settings.getIn(settingKey)} onChange={this.onChange} />
-        <span className='setting-toggle'>{label}</span>
-      </label>
+      <div className='setting-toggle'>
+        <Toggle id={id} checked={settings.getIn(settingKey)} onChange={this.onChange} />
+        <label htmlFor={id} className='setting-toggle__label'>{label}</label>
+      </div>
     );
   }
 

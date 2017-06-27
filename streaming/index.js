@@ -95,7 +95,6 @@ const startWorker = (workerId) => {
   const app    = express();
   const pgPool = new pg.Pool(Object.assign(pgConfigs[env], dbUrlToConfig(process.env.DATABASE_URL)));
   const server = http.createServer(app);
-  const wss    = new WebSocket.Server({ server });
   const redisNamespace = process.env.REDIS_NAMESPACE || null;
 
   const redisParams = {
@@ -111,11 +110,12 @@ const startWorker = (workerId) => {
 
   const redisPrefix = redisNamespace ? `${redisNamespace}:` : '';
 
+  const redisSubscribeClient = redisUrlToClient(redisParams, process.env.REDIS_URL);
   const redisClient = redisUrlToClient(redisParams, process.env.REDIS_URL);
 
   const subs = {};
 
-  redisClient.on('pmessage', (_, channel, message) => {
+  redisSubscribeClient.on('message', (channel, message) => {
     const callbacks = subs[channel];
 
     log.silly(`New message on channel ${channel}`);
@@ -127,17 +127,35 @@ const startWorker = (workerId) => {
     callbacks.forEach(callback => callback(message));
   });
 
-  redisClient.psubscribe(`${redisPrefix}timeline:*`);
+  const subscriptionHeartbeat = (channel) => {
+    const interval = 6*60;
+    const tellSubscribed = () => {
+      redisClient.set(`${redisPrefix}subscribed:${channel}`, '1', 'EX', interval*3);
+    };
+    tellSubscribed();
+    const heartbeat = setInterval(tellSubscribed, interval*1000);
+    return () => {
+      clearInterval(heartbeat);
+    };
+  };
 
   const subscribe = (channel, callback) => {
     log.silly(`Adding listener for ${channel}`);
     subs[channel] = subs[channel] || [];
+    if (subs[channel].length === 0) {
+      log.verbose(`Subscribe ${channel}`);
+      redisSubscribeClient.subscribe(channel);
+    }
     subs[channel].push(callback);
   };
 
   const unsubscribe = (channel, callback) => {
     log.silly(`Removing listener for ${channel}`);
     subs[channel] = subs[channel].filter(item => item !== callback);
+    if (subs[channel].length === 0) {
+      log.verbose(`Unsubscribe ${channel}`);
+      redisSubscribeClient.unsubscribe(channel);
+    }
   };
 
   const allowCrossDomain = (req, res, next) => {
@@ -186,14 +204,10 @@ const startWorker = (workerId) => {
     });
   };
 
-  const authenticationMiddleware = (req, res, next) => {
-    if (req.method === 'OPTIONS') {
-      next();
-      return;
-    }
-
-    const authorization = req.get('Authorization');
-    const accessToken = req.query.access_token;
+  const accountFromRequest = (req, next) => {
+    const authorization = req.headers.authorization;
+    const location = url.parse(req.url, true);
+    const accessToken = location.query.access_token;
 
     if (!authorization && !accessToken) {
       const err = new Error('Missing access token');
@@ -208,7 +222,27 @@ const startWorker = (workerId) => {
     accountFromToken(token, req, next);
   };
 
-  const errorMiddleware = (err, req, res, next) => {
+  const wsVerifyClient = (info, cb) => {
+    accountFromRequest(info.req, err => {
+      if (!err) {
+        cb(true, undefined, undefined);
+      } else {
+        log.error(info.req.requestId, err.toString());
+        cb(false, 401, 'Unauthorized');
+      }
+    });
+  };
+
+  const authenticationMiddleware = (req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      next();
+      return;
+    }
+
+    accountFromRequest(req, next);
+  };
+
+  const errorMiddleware = (err, req, res) => {
     log.error(req.requestId, err.toString());
     res.writeHead(err.statusCode || 500, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: err.statusCode ? err.toString() : 'An unexpected error occurred' }));
@@ -216,8 +250,9 @@ const startWorker = (workerId) => {
 
   const placeholders = (arr, shift = 0) => arr.map((_, i) => `$${i + 1 + shift}`).join(', ');
 
-  const streamFrom = (id, req, output, attachCloseHandler, needsFiltering = false) => {
-    log.verbose(req.requestId, `Starting stream from ${id} for ${req.accountId}`);
+  const streamFrom = (id, req, output, attachCloseHandler, needsFiltering = false, notificationOnly = false) => {
+    const streamType = notificationOnly ? ' (notification)' : '';
+    log.verbose(req.requestId, `Starting stream from ${id} for ${req.accountId}${streamType}`);
 
     const listener = message => {
       const { event, payload, queued_at } = JSON.parse(message);
@@ -230,6 +265,10 @@ const startWorker = (workerId) => {
         output(event, payload);
       };
 
+      if (notificationOnly && event !== 'notification') {
+        return;
+      }
+
       // Only messages that may require filtering are statuses, since notifications
       // are already personalized and deletes do not matter
       if (needsFiltering && event === 'update') {
@@ -240,17 +279,17 @@ const startWorker = (workerId) => {
           }
 
           const unpackedPayload  = JSON.parse(payload);
-          const targetAccountIds = [unpackedPayload.account.id].concat(unpackedPayload.mentions.map(item => item.id)).concat(unpackedPayload.reblog ? [unpackedPayload.reblog.account.id] : []);
+          const targetAccountIds = [unpackedPayload.account.id].concat(unpackedPayload.mentions.map(item => item.id));
           const accountDomain    = unpackedPayload.account.acct.split('@')[1];
 
-          if (Array.isArray(req.filteredLanguages) && req.filteredLanguages.includes(unpackedPayload.language)) {
+          if (Array.isArray(req.filteredLanguages) && req.filteredLanguages.indexOf(unpackedPayload.language) !== -1) {
             log.silly(req.requestId, `Message ${unpackedPayload.id} filtered by language (${unpackedPayload.language})`);
             done();
             return;
           }
 
           const queries = [
-            client.query(`SELECT 1 FROM blocks WHERE account_id = $1 AND target_account_id IN (${placeholders(targetAccountIds, 1)}) UNION SELECT 1 FROM mutes WHERE account_id = $1 AND target_account_id IN (${placeholders(targetAccountIds, 1)})`, [req.accountId].concat(targetAccountIds)),
+            client.query(`SELECT 1 FROM blocks WHERE (account_id = $1 AND target_account_id IN (${placeholders(targetAccountIds, 2)})) OR (account_id = $2 AND target_account_id = $1) UNION SELECT 1 FROM mutes WHERE account_id = $1 AND target_account_id IN (${placeholders(targetAccountIds, 2)})`, [req.accountId, unpackedPayload.account.id].concat(targetAccountIds)),
           ];
 
           if (accountDomain) {
@@ -298,9 +337,12 @@ const startWorker = (workerId) => {
   };
 
   // Setup stream end for HTTP
-  const streamHttpEnd = req => (id, listener) => {
+  const streamHttpEnd = (req, closeHandler = false) => (id, listener) => {
     req.on('close', () => {
       unsubscribe(id, listener);
+      if (closeHandler) {
+        closeHandler();
+      }
     });
   };
 
@@ -315,15 +357,21 @@ const startWorker = (workerId) => {
   };
 
   // Setup stream end for WebSockets
-  const streamWsEnd = (req, ws) => (id, listener) => {
+  const streamWsEnd = (req, ws, closeHandler = false) => (id, listener) => {
     ws.on('close', () => {
       log.verbose(req.requestId, `Ending stream for ${req.accountId}`);
       unsubscribe(id, listener);
+      if (closeHandler) {
+        closeHandler();
+      }
     });
 
-    ws.on('error', e => {
+    ws.on('error', () => {
       log.verbose(req.requestId, `Ending stream for ${req.accountId}`);
       unsubscribe(id, listener);
+      if (closeHandler) {
+        closeHandler();
+      }
     });
   };
 
@@ -333,7 +381,12 @@ const startWorker = (workerId) => {
   app.use(errorMiddleware);
 
   app.get('/api/v1/streaming/user', (req, res) => {
-    streamFrom(`timeline:${req.accountId}`, req, streamToHttp(req, res), streamHttpEnd(req));
+    const channel = `timeline:${req.accountId}`;
+    streamFrom(channel, req, streamToHttp(req, res), streamHttpEnd(req, subscriptionHeartbeat(channel)));
+  });
+
+  app.get('/api/v1/streaming/user/notification', (req, res) => {
+    streamFrom(`timeline:${req.accountId}`, req, streamToHttp(req, res), streamHttpEnd(req), false, true);
   });
 
   app.get('/api/v1/streaming/public', (req, res) => {
@@ -352,10 +405,12 @@ const startWorker = (workerId) => {
     streamFrom(`timeline:hashtag:${req.query.tag}:local`, req, streamToHttp(req, res), streamHttpEnd(req), true);
   });
 
+  const wss    = new WebSocket.Server({ server, verifyClient: wsVerifyClient });
+
   wss.on('connection', ws => {
-    const location = url.parse(ws.upgradeReq.url, true);
-    const token    = location.query.access_token;
-    const req      = { requestId: uuid.v4() };
+    const req      = ws.upgradeReq;
+    const location = url.parse(req.url, true);
+    req.requestId  = uuid.v4();
 
     ws.isAlive = true;
 
@@ -363,36 +418,32 @@ const startWorker = (workerId) => {
       ws.isAlive = true;
     });
 
-    accountFromToken(token, req, err => {
-      if (err) {
-        log.error(req.requestId, err);
-        ws.close();
-        return;
-      }
-
-      switch(location.query.stream) {
-      case 'user':
-        streamFrom(`timeline:${req.accountId}`, req, streamToWs(req, ws), streamWsEnd(req, ws));
-        break;
-      case 'public':
-        streamFrom('timeline:public', req, streamToWs(req, ws), streamWsEnd(req, ws), true);
-        break;
-      case 'public:local':
-        streamFrom('timeline:public:local', req, streamToWs(req, ws), streamWsEnd(req, ws), true);
-        break;
-      case 'hashtag':
-        streamFrom(`timeline:hashtag:${location.query.tag}`, req, streamToWs(req, ws), streamWsEnd(req, ws), true);
-        break;
-      case 'hashtag:local':
-        streamFrom(`timeline:hashtag:${location.query.tag}:local`, req, streamToWs(req, ws), streamWsEnd(req, ws), true);
-        break;
-      default:
-        ws.close();
-      }
-    });
+    switch(location.query.stream) {
+    case 'user':
+      const channel = `timeline:${req.accountId}`;
+      streamFrom(channel, req, streamToWs(req, ws), streamWsEnd(req, ws, subscriptionHeartbeat(channel)));
+      break;
+    case 'user:notification':
+      streamFrom(`timeline:${req.accountId}`, req, streamToWs(req, ws), streamWsEnd(req, ws), false, true);
+      break;
+    case 'public':
+      streamFrom('timeline:public', req, streamToWs(req, ws), streamWsEnd(req, ws), true);
+      break;
+    case 'public:local':
+      streamFrom('timeline:public:local', req, streamToWs(req, ws), streamWsEnd(req, ws), true);
+      break;
+    case 'hashtag':
+      streamFrom(`timeline:hashtag:${location.query.tag}`, req, streamToWs(req, ws), streamWsEnd(req, ws), true);
+      break;
+    case 'hashtag:local':
+      streamFrom(`timeline:hashtag:${location.query.tag}:local`, req, streamToWs(req, ws), streamWsEnd(req, ws), true);
+      break;
+    default:
+      ws.close();
+    }
   });
 
-  const wsInterval = setInterval(() => {
+  setInterval(() => {
     wss.clients.forEach(ws => {
       if (ws.isAlive === false) {
         ws.terminate();
