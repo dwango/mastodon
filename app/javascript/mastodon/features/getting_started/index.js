@@ -75,7 +75,7 @@ class GettingStarted extends ImmutablePureComponent {
     }
 
     navItems = navItems.concat([
-      <ColumnLink key='4' icon='star' text={intl.formatMessage(messages.favourites)} to='/favourites' />,
+      <ColumnLink key='4' icon='nicoru--column' text={intl.formatMessage(messages.favourites)} to='/favourites' />,
     ]);
 
     if (me.get('locked')) {
