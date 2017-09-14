@@ -31,5 +31,10 @@
   .fields-group
     = f.input :admin_announcement, wrapper: :with_block_label, as: :text, label: t('admin.settings.admin_announcement.title'), hint: t('admin.settings.admin_announcement.desc_html'), input_html: { rows: 8 }
 
+  %hr/
+
+  .fields-group
+    = f.input :bootstrap_timeline_accounts, wrapper: :with_block_label, label: t('admin.settings.bootstrap_timeline_accounts.title'), hint: t('admin.settings.bootstrap_timeline_accounts.desc_html')
+
   .actions
     = f.button :button, t('generic.save_changes'), type: :submit
