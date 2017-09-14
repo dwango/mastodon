@@ -28,11 +28,15 @@ class InstancePresenter
     Rails.cache.fetch('distinct_domain_count') { Account.distinct.count(:domain) }
   end
 
+  def niconico_associated_count
+    Rails.cache.fetch('niconico_associated_count') { User.where.not(uid: nil).count }
+  end
+
   def version_number
     Mastodon::Version
   end
 
-  def niconico_associated_count
-    Rails.cache.fetch('niconico_associated_count') { User.where.not(uid: nil).count }
+  def source_url
+    Mastodon::Version.source_url
   end
 end
