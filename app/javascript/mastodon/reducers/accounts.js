@@ -44,7 +44,9 @@ import {
   FAVOURITED_STATUSES_EXPAND_SUCCESS,
 } from '../actions/favourites';
 import { STORE_HYDRATE } from '../actions/store';
+import emojify from '../emoji';
 import { Map as ImmutableMap, fromJS } from 'immutable';
+import escapeTextContentForBrowser from 'escape-html';
 
 const normalizeAccount = (state, account) => {
   account = { ...account };
@@ -52,6 +54,14 @@ const normalizeAccount = (state, account) => {
   delete account.followers_count;
   delete account.following_count;
   delete account.statuses_count;
+
+  const profileEmojiMap = (account.profile_emojis || []).reduce((obj, emoji) => {
+    obj[emoji.shortcode] = emoji;
+    return obj;
+  }, {});
+  const displayName = account.display_name.length === 0 ? account.username : account.display_name;
+  account.display_name_html = emojify(escapeTextContentForBrowser(displayName), profileEmojiMap);
+  account.note_emojified = emojify(account.note, profileEmojiMap);
 
   return state.set(account.id, fromJS(account));
 };

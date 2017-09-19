@@ -31,6 +31,7 @@ class Status < ApplicationRecord
   include Cacheable
   include StatusThreadingConcern
   include EmojiHelper
+  include StatusProfileEmoji
 
   enum visibility: [:public, :unlisted, :private, :direct], _suffix: :visibility
 

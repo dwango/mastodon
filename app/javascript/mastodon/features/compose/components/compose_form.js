@@ -58,6 +58,11 @@ export default class ComposeForm extends ImmutablePureComponent {
     showSearch: PropTypes.bool,
     onNicoru: PropTypes.func.isRequired,
     enquete: ImmutablePropTypes.map.isRequired,
+    emoji_suggestion_token: PropTypes.string,
+    emoji_suggestions: ImmutablePropTypes.list,
+    onClearProfileEmojiSuggestions: PropTypes.func.isRequired,
+    onFetchProfileEmojiSuggestions: PropTypes.func.isRequired,
+    onProfileEmojiSuggestionSelected: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -99,6 +104,18 @@ export default class ComposeForm extends ImmutablePureComponent {
 
   handleChangeSpoilerText = (e) => {
     this.props.onChangeSpoilerText(e.target.value);
+  }
+
+  onProfileEmojiSuggestionsClearRequested = () => {
+    this.props.onClearProfileEmojiSuggestions();
+  }
+
+  onProfileEmojiSuggestionsFetchRequested = debounce((token) => {
+    this.props.onFetchProfileEmojiSuggestions(token);
+  }, 500, { trailing: true })
+
+  onProfileEmojiSuggestionSelected = (tokenStart, token, value) => {
+    this.props.onProfileEmojiSuggestionSelected(tokenStart, token, value);
   }
 
   componentWillReceiveProps (nextProps) {
@@ -205,6 +222,10 @@ export default class ComposeForm extends ImmutablePureComponent {
             onSuggestionSelected={this.onSuggestionSelected}
             onPaste={onPaste}
             autoFocus={!showSearch && !isMobile(window.innerWidth)}
+            emojiSuggestions={this.props.emoji_suggestions}
+            onProfileEmojiSuggestionsFetchRequested={this.onProfileEmojiSuggestionsFetchRequested}
+            onProfileEmojiSuggestionsClearRequested={this.onProfileEmojiSuggestionsClearRequested}
+            onProfileEmojiSuggestionSelected={this.onProfileEmojiSuggestionSelected}
           />
 
           <EmojiPickerDropdown onPickEmoji={this.handleEmojiPick} />

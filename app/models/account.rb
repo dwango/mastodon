@@ -44,7 +44,7 @@
 #
 
 class Account < ApplicationRecord
-  MENTION_RE = /(?:^|[^\/[:word:]])@(([a-z0-9_]+)(?:@[a-z0-9\.\-]+[a-z0-9]+)?)/i
+  MENTION_RE = /(?:^|[^\/[:word:]:])@(([a-z0-9_]+)(?:@[a-z0-9\.\-]+[a-z0-9]+)?)/i
 
   include AccountAvatar
   include AccountFinderConcern
@@ -53,6 +53,7 @@ class Account < ApplicationRecord
   include Attachmentable
   include Remotable
   include EmojiHelper
+  include AccountProfileEmoji
 
   enum protocol: [:ostatus, :activitypub]
 
@@ -276,3 +277,4 @@ class Account < ApplicationRecord
 end
 
 Account.include(Friends::FavouriteTagsExtension)
+Account.include(Friends::ProfileEmojiModel)

@@ -9,7 +9,7 @@ class Formatter
 
   include ActionView::Helpers::TextHelper
 
-  def format(status)
+  def format(status, options = {})
     if status.reblog?
       prepend_reblog = status.reblog.account.acct
       status         = status.proper
@@ -19,7 +19,11 @@ class Formatter
 
     raw_content = status.text
 
-    return reformat(raw_content) unless status.local?
+    unless status.local?
+      html = reformat(raw_content)
+      html = encode_profile_emojis(html, status.profile_emojis) if options[:profile_emojify]
+      return html
+    end
 
     linkable_accounts = status.mentions.map(&:account)
     linkable_accounts << status.account
@@ -27,6 +31,7 @@ class Formatter
     html = raw_content
     html = "RT @#{prepend_reblog} #{html}" if prepend_reblog
     html = encode_and_link_urls(html, linkable_accounts)
+    html = encode_profile_emojis(html, status.profile_emojis) if options[:profile_emojify]
     html = simple_format(html, {}, sanitize: false)
     html = html.delete("\n")
 
@@ -92,6 +97,50 @@ class Formatter
         link_to_niconico(entity)
       end
     end
+  end
+
+  def encode_profile_emojis(html, profile_emojis)
+    return html if profile_emojis == nil || profile_emojis.empty?
+
+    profile_emoji_map = profile_emojis.map { |e| [e[:shortcode], e] }.to_h
+
+    i = -1
+    inside_tag = false
+    inside_colon = false
+    shortname = ''
+    shortname_start_index = -1
+    while i + 1 < html.size
+      i += 1
+      if html[i] == '<'
+        inside_tag = true
+      elsif inside_tag && html[i] == '>'
+        inside_tag = false
+      elsif !inside_tag
+        if !inside_colon && html[i] == ':'
+          inside_colon = true
+          shortname = ''
+          shortname_start_index = i
+        elsif inside_colon && html[i] == ':'
+          inside_colon = false
+          stripped_shortname = shortname[1..-1]
+          emoji = profile_emoji_map[stripped_shortname]
+          if shortname[0] == '@' && emoji
+            replacement = "<a href=\"#{emoji[:account_url]}\" class=\"profile-emoji\" data-account-name=\"#{stripped_shortname}\">" \
+                        +   "<img draggable=\"false\" class=\"emojione\" alt=\":#{shortname}:\" title=\":#{shortname}:\"  src=\"#{emoji[:url]}\" />" \
+                        + "</a>"
+            before_html = shortname_start_index.positive? ? html[0..shortname_start_index - 1] : ''
+            html = before_html + replacement + html[i + 1..-1]
+            i = shortname_start_index + replacement.size - 1
+          else
+            i -= 1
+          end
+        elsif inside_colon && html[i] != ' '
+          shortname += html[i]
+        end
+      end
+    end
+
+    html
   end
 
   def rewrite(text, entities)

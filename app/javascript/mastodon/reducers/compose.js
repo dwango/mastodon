@@ -23,6 +23,9 @@ import {
   COMPOSE_COMPOSING_CHANGE,
   COMPOSE_EMOJI_INSERT,
   COMPOSE_NICORU_INSERT,
+  COMPOSE_PROFILE_EMOJI_SUGGESTIONS_CLEAR,
+  COMPOSE_PROFILE_EMOJI_SUGGESTIONS_READY,
+  COMPOSE_PROFILE_EMOJI_SUGGESTION_SELECT,
 } from '../actions/compose';
 import { COMPOSE_LOCK_TAG } from '../actions/favourite_tags';
 import { TIMELINE_DELETE } from '../actions/timelines';
@@ -53,6 +56,8 @@ const initialState = ImmutableMap({
   resetFileKey: Math.floor((Math.random() * 0x10000)),
   idempotencyKey: null,
   defaultText: '',
+  emoji_suggestion_token: null,
+  emoji_suggestions: ImmutableList(),
 });
 
 function statusToTextMentions(state, status) {
@@ -159,6 +164,26 @@ const privacyPreference = (a, b) => {
   } else {
     return 'public';
   }
+};
+
+const setProfileEmojiSuggestions = (state, accounts, token) => {
+  return state
+    .set('emoji_suggestions', fromJS(accounts.map(account => ({
+      shortcode: `@${account.username}`,
+      url: account.avatar_static,
+      original_url: account.avatar,
+    }))))
+    .set('emoji_suggestion_token', token);
+};
+
+const insertProfileEmojiSuggestion = (state, position, token, completion) => {
+  return state.withMutations(map => {
+    map.update('text', oldText => `${oldText.slice(0, position)}${completion}:${oldText.slice(position + token.length + 1)}`);
+    map.set('emoji_suggestion_token', null);
+    map.update('emoji_suggestions', ImmutableList(), list => list.clear());
+    map.set('focusDate', new Date());
+    map.set('idempotencyKey', uuid());
+  });
 };
 
 export default function compose(state = initialState, action) {
@@ -270,6 +295,14 @@ export default function compose(state = initialState, action) {
     return insertNicoru(state, action.position);
   case COMPOSE_LOCK_TAG:
     return setDefaultText(state, action.tag);
+  case COMPOSE_PROFILE_EMOJI_SUGGESTIONS_CLEAR:
+    return state
+      .update('emoji_suggestions', ImmutableList(), list => list.clear())
+      .set('emoji_suggestion_token', null);
+  case COMPOSE_PROFILE_EMOJI_SUGGESTIONS_READY:
+    return setProfileEmojiSuggestions(state, action.accounts, action.token);
+  case COMPOSE_PROFILE_EMOJI_SUGGESTION_SELECT:
+    return insertProfileEmojiSuggestion(state, action.position, action.token, action.completion);
   default:
     return state;
   }

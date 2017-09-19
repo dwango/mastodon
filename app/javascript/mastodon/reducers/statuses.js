@@ -37,7 +37,9 @@ import {
   VOTE_SUCCESS,
   SET_ENQUETE_TIMEOUT,
 } from '../actions/enquetes';
+import emojify from '../emoji';
 import { Map as ImmutableMap, fromJS } from 'immutable';
+import escapeTextContentForBrowser from 'escape-html';
 
 const normalizeStatus = (state, status) => {
   if (!status) {
@@ -53,7 +55,14 @@ const normalizeStatus = (state, status) => {
   }
 
   const searchContent = [status.spoiler_text, status.content].join(' ').replace(/<br \/>/g, '\n').replace(/<\/p><p>/g, '\n\n');
+  const profileEmojiMap = (normalStatus.profile_emojis || []).reduce((obj, emoji) => {
+    obj[emoji.shortcode] = emoji;
+    return obj;
+  }, {});
+
   normalStatus.search_index = new DOMParser().parseFromString(searchContent, 'text/html').documentElement.textContent;
+  normalStatus.contentHtml = emojify(normalStatus.content, profileEmojiMap);
+  normalStatus.spoilerHtml = emojify(escapeTextContentForBrowser(normalStatus.spoiler_text || ''), profileEmojiMap);
 
   return state.update(status.id, ImmutableMap(), map => map.mergeDeep(fromJS(normalStatus)));
 };
