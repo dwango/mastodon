@@ -29,8 +29,8 @@ const mapStateToProps = state => ({
   me: state.getIn(['compose', 'me']),
   showSearch: state.getIn(['search', 'submitted']) && !state.getIn(['search', 'hidden']),
   enquete: state.get('enquetes'),
-  emoji_suggestion_token: state.getIn(['compose', 'emoji_suggestion_token']),
-  emoji_suggestions: state.getIn(['compose', 'emoji_suggestions']),
+  profileEmojiSuggestionToken: state.getIn(['compose', 'profile_emoji_suggestion_token']),
+  profileEmojiSuggestions: state.getIn(['compose', 'profile_emoji_suggestions']),
 });
 
 const mapDispatchToProps = (dispatch) => ({

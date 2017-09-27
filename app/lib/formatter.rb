@@ -58,7 +58,6 @@ class Formatter
     html = encode_and_link_urls(display_name)
     html = encode_profile_emojis(html, account.profile_emojis, false) if options[:profile_emojify]
 
-    p html.html_safe
     html.html_safe # rubocop:disable Rails/OutputSafety
   end
 

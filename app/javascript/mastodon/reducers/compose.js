@@ -56,8 +56,8 @@ const initialState = ImmutableMap({
   resetFileKey: Math.floor((Math.random() * 0x10000)),
   idempotencyKey: null,
   defaultText: '',
-  emoji_suggestion_token: null,
-  emoji_suggestions: ImmutableList(),
+  profile_emoji_suggestion_token: null,
+  profile_emoji_suggestions: ImmutableList(),
 });
 
 function statusToTextMentions(state, status) {
@@ -178,19 +178,19 @@ const hydrate = (state, hydratedState) => {
 
 const setProfileEmojiSuggestions = (state, accounts, token) => {
   return state
-    .set('emoji_suggestions', fromJS(accounts.map(account => ({
+    .set('profile_emoji_suggestions', fromJS(accounts.map(account => ({
       shortcode: `@${account.username}`,
       url: account.avatar_static,
       original_url: account.avatar,
     }))))
-    .set('emoji_suggestion_token', token);
+    .set('profile_emoji_suggestion_token', token);
 };
 
 const insertProfileEmojiSuggestion = (state, position, token, completion) => {
   return state.withMutations(map => {
     map.update('text', oldText => `${oldText.slice(0, position)}${completion}:${oldText.slice(position + token.length + 1)}`);
-    map.set('emoji_suggestion_token', null);
-    map.update('emoji_suggestions', ImmutableList(), list => list.clear());
+    map.set('profile_emoji_suggestion_token', null);
+    map.update('profile_emoji_suggestions', ImmutableList(), list => list.clear());
     map.set('focusDate', new Date());
     map.set('idempotencyKey', uuid());
   });
@@ -307,8 +307,8 @@ export default function compose(state = initialState, action) {
     return setDefaultText(state, action.tag);
   case COMPOSE_PROFILE_EMOJI_SUGGESTIONS_CLEAR:
     return state
-      .update('emoji_suggestions', ImmutableList(), list => list.clear())
-      .set('emoji_suggestion_token', null);
+      .update('profile_emoji_suggestions', ImmutableList(), list => list.clear())
+      .set('profile_emoji_suggestion_token', null);
   case COMPOSE_PROFILE_EMOJI_SUGGESTIONS_READY:
     return setProfileEmojiSuggestions(state, action.accounts, action.token);
   case COMPOSE_PROFILE_EMOJI_SUGGESTION_SELECT:

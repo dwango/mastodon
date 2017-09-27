@@ -1,6 +1,6 @@
 import React from 'react';
 import AutosuggestAccountContainer from '../features/compose/containers/autosuggest_account_container';
-import AutosuggestEmoji from '../features/compose/components/autosuggest_emoji';
+import AutosuggestProfileEmoji from '../features/compose/components/autosuggest_profile_emoji';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import { isRtl } from '../rtl';
@@ -32,7 +32,7 @@ const textAtCursorMatchesToken = (str, caretPosition) => {
   }
 };
 
-const textAtCursorMatchesEmojiToken = (str, caretPosition) => {
+const textAtCursorMatchesProfileEmojiToken = (str, caretPosition) => {
   let word;
 
   let left  = str.slice(0, caretPosition).search(/:\S+$/);
@@ -75,7 +75,7 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
     onKeyDown: PropTypes.func,
     onPaste: PropTypes.func.isRequired,
     autoFocus: PropTypes.bool,
-    emojiSuggestions: ImmutablePropTypes.list,
+    profileEmojiSuggestions: ImmutablePropTypes.list,
     onProfileEmojiSuggestionSelected: PropTypes.func.isRequired,
     onProfileEmojiSuggestionsFetchRequested: PropTypes.func.isRequired,
     onProfileEmojiSuggestionsClearRequested: PropTypes.func.isRequired,
@@ -94,7 +94,7 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
 
   onChange = (e) => {
     const [ tokenStart, token ] = textAtCursorMatchesToken(e.target.value, e.target.selectionStart);
-    const [ emojiTokenStart, emojiToken ] = textAtCursorMatchesEmojiToken(e.target.value, e.target.selectionStart);
+    const [ emojiTokenStart, emojiToken ] = textAtCursorMatchesProfileEmojiToken(e.target.value, e.target.selectionStart);
 
     if (token !== null && this.state.lastToken !== token) {
       this.setState({ lastToken: token, selectedSuggestion: 0, tokenStart });
@@ -120,7 +120,7 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
   }
 
   onKeyDown = (e) => {
-    const { suggestions, emojiSuggestions, disabled } = this.props;
+    const { suggestions, profileEmojiSuggestions, disabled } = this.props;
     const { selectedSuggestion, suggestionsHidden } = this.state;
 
     if (disabled) {
@@ -141,9 +141,9 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
         e.preventDefault();
         this.setState({ selectedSuggestion: Math.min(selectedSuggestion + 1, suggestions.size - 1) });
       }
-      if (emojiSuggestions.size > 0 && !suggestionsHidden) {
+      if (profileEmojiSuggestions.size > 0 && !suggestionsHidden) {
         e.preventDefault();
-        this.setState({ selectedSuggestion: Math.min(selectedSuggestion + 1, emojiSuggestions.size - 1) });
+        this.setState({ selectedSuggestion: Math.min(selectedSuggestion + 1, profileEmojiSuggestions.size - 1) });
       }
 
       break;
@@ -152,7 +152,7 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
         e.preventDefault();
         this.setState({ selectedSuggestion: Math.max(selectedSuggestion - 1, 0) });
       }
-      if (emojiSuggestions.size > 0 && !suggestionsHidden) {
+      if (profileEmojiSuggestions.size > 0 && !suggestionsHidden) {
         e.preventDefault();
         this.setState({ selectedSuggestion: Math.max(selectedSuggestion - 1, 0) });
       }
@@ -166,10 +166,10 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
         e.stopPropagation();
         this.props.onSuggestionSelected(this.state.tokenStart, this.state.lastToken, suggestions.get(selectedSuggestion));
       }
-      if (this.state.lastToken !== null && emojiSuggestions.size > 0 && !suggestionsHidden) {
+      if (this.state.lastToken !== null && profileEmojiSuggestions.size > 0 && !suggestionsHidden) {
         e.preventDefault();
         e.stopPropagation();
-        this.props.onProfileEmojiSuggestionSelected(this.state.tokenStart, this.state.lastToken, emojiSuggestions.getIn([selectedSuggestion, 'shortcode']));
+        this.props.onProfileEmojiSuggestionSelected(this.state.tokenStart, this.state.lastToken, profileEmojiSuggestions.getIn([selectedSuggestion, 'shortcode']));
       }
 
       break;
@@ -195,7 +195,7 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
 
   onProfileEmojiSuggestionClick = (e) => {
     const index = Number(e.currentTarget.getAttribute('data-index'));
-    const completion = this.props.emojiSuggestions.getIn([index, 'shortcode']);
+    const completion = this.props.profileEmojiSuggestions.getIn([index, 'shortcode']);
     e.preventDefault();
     this.props.onProfileEmojiSuggestionSelected(this.state.tokenStart, this.state.lastToken, completion);
     this.textarea.focus();
@@ -205,7 +205,7 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
     if (nextProps.suggestions !== this.props.suggestions && nextProps.suggestions.size > 0 && this.state.suggestionsHidden) {
       this.setState({ suggestionsHidden: false });
     }
-    if (nextProps.emojiSuggestions !== this.props.emojiSuggestions && nextProps.emojiSuggestions.size > 0 && this.state.suggestionsHidden) {
+    if (nextProps.profileEmojiSuggestions !== this.props.profileEmojiSuggestions && nextProps.profileEmojiSuggestions.size > 0 && this.state.suggestionsHidden) {
       this.setState({ suggestionsHidden: false });
     }
   }
@@ -222,10 +222,10 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
   }
 
   render () {
-    const { value, suggestions, disabled, placeholder, onKeyUp, autoFocus, emojiSuggestions } = this.props;
+    const { value, suggestions, disabled, placeholder, onKeyUp, autoFocus, profileEmojiSuggestions } = this.props;
     const { suggestionsHidden, selectedSuggestion } = this.state;
     const style = { direction: 'ltr' };
-    const isSuggestionsHidden = suggestionsHidden || (suggestions.isEmpty() && emojiSuggestions.isEmpty());
+    const isSuggestionsHidden = suggestionsHidden || (suggestions.isEmpty() && profileEmojiSuggestions.isEmpty());
 
     if (isRtl(value)) {
       style.direction = 'rtl';
@@ -265,7 +265,7 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
             </div>
           ))}
 
-          {emojiSuggestions.map((suggestion, i) => (
+          {profileEmojiSuggestions.map((suggestion, i) => (
             <div
               role='button'
               tabIndex='0'
@@ -274,7 +274,7 @@ export default class AutosuggestTextarea extends ImmutablePureComponent {
               className={`autosuggest-textarea__suggestions__item ${i === selectedSuggestion ? 'selected' : ''}`}
               onMouseDown={this.onProfileEmojiSuggestionClick}
             >
-              <AutosuggestEmoji emoji={suggestion} />
+              <AutosuggestProfileEmoji profileEmoji={suggestion} />
             </div>
           ))}
         </div>

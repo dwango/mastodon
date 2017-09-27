@@ -58,8 +58,8 @@ export default class ComposeForm extends ImmutablePureComponent {
     showSearch: PropTypes.bool,
     onNicoru: PropTypes.func.isRequired,
     enquete: ImmutablePropTypes.map.isRequired,
-    emoji_suggestion_token: PropTypes.string,
-    emoji_suggestions: ImmutablePropTypes.list,
+    profileEmojiSuggestionToken: PropTypes.string,
+    profileEmojiSuggestions: ImmutablePropTypes.list,
     onClearProfileEmojiSuggestions: PropTypes.func.isRequired,
     onFetchProfileEmojiSuggestions: PropTypes.func.isRequired,
     onProfileEmojiSuggestionSelected: PropTypes.func.isRequired,
@@ -222,7 +222,7 @@ export default class ComposeForm extends ImmutablePureComponent {
             onSuggestionSelected={this.onSuggestionSelected}
             onPaste={onPaste}
             autoFocus={!showSearch && !isMobile(window.innerWidth)}
-            emojiSuggestions={this.props.emoji_suggestions}
+            profileEmojiSuggestions={this.props.profileEmojiSuggestions}
             onProfileEmojiSuggestionsFetchRequested={this.onProfileEmojiSuggestionsFetchRequested}
             onProfileEmojiSuggestionsClearRequested={this.onProfileEmojiSuggestionsClearRequested}
             onProfileEmojiSuggestionSelected={this.onProfileEmojiSuggestionSelected}
