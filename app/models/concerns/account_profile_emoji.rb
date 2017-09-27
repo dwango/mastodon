@@ -19,3 +19,5 @@ module AccountProfileEmoji
     "profile_emojis:account:#{self.id}"
   end
 end
+
+test
