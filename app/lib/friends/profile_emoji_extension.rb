@@ -4,8 +4,6 @@ module Friends
   module ProfileEmojiExtension
     extend ActiveSupport::Concern
 
-    Acct = Struct.new(:username, :domain)
-
     PROFILE_EMOJI_CACHE_TTL = 60.second
     PROFILE_EMOJI_RE = /:@(\w+)(?:@([\w\.\-]+\w+))?\:/.freeze
     IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif'].freeze
@@ -34,15 +32,11 @@ module Friends
     end
 
     def scan_profile_emojis_from_text(text)
-      scaned_usernames = []
-      text.scan(PROFILE_EMOJI_RE).map { |username, domain|
-        acct = Acct.new(username, domain)
-        next if scaned_usernames.include? acct
-        a = Account.find_by(username: username, domain: domain)
-        next if a.nil?
-        scaned_usernames << acct
+      text.scan(PROFILE_EMOJI_RE).uniq.map { |username, domain|
+        acct = Account.find_by(username: username, domain: domain)
+        next if acct.nil?
         {
-          account_id: a.id,
+          account_id: acct.id,
           updated_at: Time.now.utc.to_i,
         }
       }.compact
