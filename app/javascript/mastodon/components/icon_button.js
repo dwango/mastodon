@@ -68,12 +68,17 @@ export default class IconButton extends React.PureComponent {
       classes.push('overlayed');
     }
 
+    let rotateDeg = 0;
+    if (this.props.active) {
+      rotateDeg = this.props.icon === 'nicoru--status' ? -450 : -360;
+    }
+
     if (this.props.className) {
       classes.push(this.props.className);
     }
 
     return (
-      <Motion defaultStyle={{ rotate: this.props.active ? -360 : 0 }} style={{ rotate: this.props.animate ? spring(this.props.active ? -360 : 0, { stiffness: 120, damping: 7 }) : 0 }}>
+      <Motion defaultStyle={{ rotate: rotateDeg }} style={{ rotate: this.props.animate ? spring(rotateDeg : 0, { stiffness: 120, damping: 7 }) : 0 }}>
         {({ rotate }) =>
           <button
             aria-label={this.props.title}

@@ -1,0 +1,65 @@
+/**
+ * Declarations
+ */
+$icon-size--nico: 24px;
+$icon-size--nico--large: 36px;
+
+/**
+ * Global Mixins
+ */
+@mixin icon--nico($size: $icon-size--nico) {
+  display: block;
+  width: $size;
+  height: $size;
+  background-image: url('../images/icon_niconico.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+/**
+ * Global Styles
+ */
+.fa-nico {
+  @include icon--nico(16px);
+  display: inline-block;
+}
+
+button.icon-button.active i.fa-nicoru {
+  background-image: url('../images/nicoru.svg');
+}
+
+.fa-nicoru {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-image: url('../images/nicoru.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+
+  &.fa-fw {
+    width: 22px;
+    height: 16px;
+  }
+
+  &.active {
+    background-image: url('../images/nicoru.svg');
+  }
+
+  &--column {
+    @extend .fa-nicoru;
+    background-image: url('../images/nicoru-column.svg');
+  }
+
+  &--status {
+    @extend .fa-nicoru;
+    background-image: url('../images/nicoru-status.svg');
+  }
+
+  &--detailed {
+    @extend .fa-nicoru;
+    background-image: url('../images/nicoru-detailed.svg');
+    vertical-align: middle;
+  }
+}

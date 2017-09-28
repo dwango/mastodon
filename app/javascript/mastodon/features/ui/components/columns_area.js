@@ -9,6 +9,7 @@ import { links, getIndex, getLink } from './tabs_bar';
 
 import BundleContainer from '../containers/bundle_container';
 import ColumnLoading from './column_loading';
+import DrawerLoading from './drawer_loading';
 import BundleColumnError from './bundle_column_error';
 import { Compose, Notifications, HomeTimeline, CommunityTimeline, PublicTimeline, HashtagTimeline, FavouritedStatuses } from '../../ui/util/async-components';
 
@@ -37,6 +38,8 @@ export default class ColumnsArea extends ImmutablePureComponent {
     columns: ImmutablePropTypes.list.isRequired,
     singleColumn: PropTypes.bool,
     children: PropTypes.node,
+    tutorial: PropTypes.bool,
+    closeTutorial: PropTypes.func,
   };
 
   state = {
@@ -59,6 +62,9 @@ export default class ColumnsArea extends ImmutablePureComponent {
     if (this.props.singleColumn !== nextProps.singleColumn && nextProps.singleColumn) {
       this.node.removeEventListener('wheel', this.handleWheel);
     }
+    if (this.props.singleColumn) {
+      this.props.closeTutorial();
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -75,9 +81,12 @@ export default class ColumnsArea extends ImmutablePureComponent {
     }
   }
 
-  handleChildrenContentChange() {
-    if (!this.props.singleColumn) {
-      scrollRight(this.node, this.node.scrollWidth - window.innerWidth);
+  handleChildrenContentChange(prevProps) {
+    if (!this.props.singleColumn && !this.props.tutorial) {
+      this._interruptScrollAnimation = scrollRight(this.node, this.node.scrollWidth - window.innerWidth);
+    }
+    if (this.props.children !== prevProps.children && !this.props.singleColumn && !this.props.tutorial) {
+      scrollRight(this.node);
     }
   }
 
@@ -129,8 +138,8 @@ export default class ColumnsArea extends ImmutablePureComponent {
     );
   }
 
-  renderLoading = () => {
-    return <ColumnLoading />;
+  renderLoading = columnId => () => {
+    return columnId === 'COMPOSE' ? <DrawerLoading /> : <ColumnLoading />;
   }
 
   renderError = (props) => {
@@ -158,7 +167,7 @@ export default class ColumnsArea extends ImmutablePureComponent {
           const params = column.get('params', null) === null ? null : column.get('params').toJS();
 
           return (
-            <BundleContainer key={column.get('uuid')} fetchComponent={componentMap[column.get('id')]} loading={this.renderLoading} error={this.renderError}>
+            <BundleContainer key={column.get('uuid')} fetchComponent={componentMap[column.get('id')]} loading={this.renderLoading(column.get('id'))} error={this.renderError}>
               {SpecificComponent => <SpecificComponent columnId={column.get('uuid')} params={params} multiColumn />}
             </BundleContainer>
           );

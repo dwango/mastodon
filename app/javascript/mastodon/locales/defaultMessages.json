@@ -197,6 +197,10 @@
       {
         "defaultMessage": "Unpin from profile",
         "id": "status.unpin"
+      },
+      {
+        "defaultMessage": "Embed",
+        "id": "status.embed"
       }
     ],
     "path": "app/javascript/mastodon/components/status_action_bar.json"
@@ -432,7 +436,7 @@
         "id": "account.follow"
       },
       {
-        "defaultMessage": "Awaiting approval",
+        "defaultMessage": "Awaiting approval. Click to cancel follow request",
         "id": "account.requested"
       },
       {
@@ -546,6 +550,15 @@
       }
     ],
     "path": "app/javascript/mastodon/features/compose/components/emoji_picker_dropdown.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "Favourite tags",
+        "id": "compose_form.favourite_tags"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/compose/components/favourite_tags.json"
   },
   {
     "descriptors": [
@@ -809,6 +822,10 @@
         "id": "navigation_bar.info"
       },
       {
+        "defaultMessage": "Pinned toots",
+        "id": "navigation_bar.pins"
+      },
+      {
         "defaultMessage": "FAQ",
         "id": "getting_started.faq"
       },
@@ -991,6 +1008,15 @@
   {
     "descriptors": [
       {
+        "defaultMessage": "Pinned toot",
+        "id": "column.pins"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/pinned_statuses/index.json"
+  },
+  {
+    "descriptors": [
+      {
         "defaultMessage": "Federated timeline",
         "id": "column.public"
       },
@@ -1051,6 +1077,10 @@
       {
         "defaultMessage": "Unpin from profile",
         "id": "status.unpin"
+      },
+      {
+        "defaultMessage": "Embed",
+        "id": "status.embed"
       }
     ],
     "path": "app/javascript/mastodon/features/status/components/action_bar.json"
@@ -1123,6 +1153,23 @@
       }
     ],
     "path": "app/javascript/mastodon/features/ui/components/confirmation_modal.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "Embed",
+        "id": "status.embed"
+      },
+      {
+        "defaultMessage": "Embed this status on your website by copying the code below.",
+        "id": "embed.instructions"
+      },
+      {
+        "defaultMessage": "Here is what it will look like:",
+        "id": "embed.preview"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/ui/components/embed_modal.json"
   },
   {
     "descriptors": [
@@ -1301,5 +1348,54 @@
       }
     ],
     "path": "app/javascript/mastodon/features/ui/components/video_modal.json"
+  },
+  {
+    "descriptors": [
+      {
+        "defaultMessage": "Play",
+        "id": "video.play"
+      },
+      {
+        "defaultMessage": "Pause",
+        "id": "video.pause"
+      },
+      {
+        "defaultMessage": "Mute sound",
+        "id": "video.mute"
+      },
+      {
+        "defaultMessage": "Unmute sound",
+        "id": "video.unmute"
+      },
+      {
+        "defaultMessage": "Hide video",
+        "id": "video.hide"
+      },
+      {
+        "defaultMessage": "Expand video",
+        "id": "video.expand"
+      },
+      {
+        "defaultMessage": "Close video",
+        "id": "video.close"
+      },
+      {
+        "defaultMessage": "Full screen",
+        "id": "video.fullscreen"
+      },
+      {
+        "defaultMessage": "Exit full screen",
+        "id": "video.exit_fullscreen"
+      },
+      {
+        "defaultMessage": "Sensitive content",
+        "id": "status.sensitive_warning"
+      },
+      {
+        "defaultMessage": "Click to view",
+        "id": "status.sensitive_toggle"
+      }
+    ],
+    "path": "app/javascript/mastodon/features/video/index.json"
   }
 ]

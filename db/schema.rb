@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170829215220) do
+ActiveRecord::Schema.define(version: 20170913000752) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -98,6 +98,14 @@ ActiveRecord::Schema.define(version: 20170829215220) do
     t.index ["domain"], name: "index_domain_blocks_on_domain", unique: true
   end
 
+  create_table "favourite_tags", force: :cascade do |t|
+    t.integer "account_id", null: false
+    t.integer "tag_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "tag_id"], name: "index_favourite_tags_on_account_id_and_tag_id", unique: true
+  end
+
   create_table "favourites", id: :serial, force: :cascade do |t|
     t.integer "account_id", null: false
     t.integer "status_id", null: false
@@ -180,6 +188,7 @@ ActiveRecord::Schema.define(version: 20170829215220) do
     t.integer "from_account_id"
     t.index ["account_id", "activity_id", "activity_type"], name: "account_activity", unique: true
     t.index ["activity_id", "activity_type"], name: "index_notifications_on_activity_id_and_activity_type"
+    t.index ["id", "account_id", "activity_type"], name: "index_notifications_on_id_and_account_id_and_activity_type", order: { id: :desc }
   end
 
   create_table "oauth_access_grants", id: :serial, force: :cascade do |t|
@@ -224,17 +233,14 @@ ActiveRecord::Schema.define(version: 20170829215220) do
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
-  create_table "preview_cards", id: :serial, force: :cascade do |t|
-    t.bigint "status_id"
+  create_table "preview_cards", force: :cascade do |t|
     t.string "url", default: "", null: false
-    t.string "title"
-    t.string "description"
+    t.string "title", default: "", null: false
+    t.string "description", default: "", null: false
     t.string "image_file_name"
     t.string "image_content_type"
     t.integer "image_file_size"
     t.datetime "image_updated_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "type", default: 0, null: false
     t.text "html", default: "", null: false
     t.string "author_name", default: "", null: false
@@ -243,7 +249,15 @@ ActiveRecord::Schema.define(version: 20170829215220) do
     t.string "provider_url", default: "", null: false
     t.integer "width", default: 0, null: false
     t.integer "height", default: 0, null: false
-    t.index ["status_id"], name: "index_preview_cards_on_status_id", unique: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["url"], name: "index_preview_cards_on_url", unique: true
+  end
+
+  create_table "preview_cards_statuses", id: false, force: :cascade do |t|
+    t.bigint "preview_card_id", null: false
+    t.bigint "status_id", null: false
+    t.index ["status_id", "preview_card_id"], name: "index_preview_cards_statuses_on_status_id_and_preview_card_id"
   end
 
   create_table "reports", id: :serial, force: :cascade do |t|
@@ -282,6 +296,18 @@ ActiveRecord::Schema.define(version: 20170829215220) do
     t.index ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true
   end
 
+  create_table "site_uploads", force: :cascade do |t|
+    t.string "var", default: "", null: false
+    t.string "file_file_name"
+    t.string "file_content_type"
+    t.integer "file_file_size"
+    t.datetime "file_updated_at"
+    t.json "meta"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["var"], name: "index_site_uploads_on_var", unique: true
+  end
+
   create_table "status_pins", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.bigint "status_id", null: false
@@ -309,6 +335,8 @@ ActiveRecord::Schema.define(version: 20170829215220) do
     t.integer "reblogs_count", default: 0, null: false
     t.string "language"
     t.bigint "conversation_id"
+    t.json "enquete"
+    t.boolean "local"
     t.index ["account_id", "id"], name: "index_statuses_on_account_id_id"
     t.index ["conversation_id"], name: "index_statuses_on_conversation_id"
     t.index ["in_reply_to_id"], name: "index_statuses_on_in_reply_to_id"
@@ -382,11 +410,16 @@ ActiveRecord::Schema.define(version: 20170829215220) do
     t.boolean "otp_required_for_login", default: false, null: false
     t.datetime "last_emailed_at"
     t.string "otp_backup_codes", array: true
+    t.string "provider"
+    t.string "uid"
+    t.boolean "hide_oauth", default: false
     t.string "filtered_languages", default: [], null: false, array: true
     t.index ["account_id"], name: "index_users_on_account_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["filtered_languages"], name: "index_users_on_filtered_languages", using: :gin
+    t.index ["provider", "uid", "hide_oauth"], name: "index_users_on_provider_and_uid_and_hide_oauth"
+    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
@@ -412,6 +445,8 @@ ActiveRecord::Schema.define(version: 20170829215220) do
   add_foreign_key "blocks", "accounts", on_delete: :cascade
   add_foreign_key "conversation_mutes", "accounts", on_delete: :cascade
   add_foreign_key "conversation_mutes", "conversations", on_delete: :cascade
+  add_foreign_key "favourite_tags", "accounts", on_delete: :cascade
+  add_foreign_key "favourite_tags", "tags", on_delete: :cascade
   add_foreign_key "favourites", "accounts", on_delete: :cascade
   add_foreign_key "favourites", "statuses", on_delete: :cascade
   add_foreign_key "follow_requests", "accounts", column: "target_account_id", on_delete: :cascade
@@ -432,7 +467,6 @@ ActiveRecord::Schema.define(version: 20170829215220) do
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id", on_delete: :cascade
   add_foreign_key "oauth_access_tokens", "users", column: "resource_owner_id", on_delete: :cascade
   add_foreign_key "oauth_applications", "users", column: "owner_id", on_delete: :cascade
-  add_foreign_key "preview_cards", "statuses", on_delete: :cascade
   add_foreign_key "reports", "accounts", column: "action_taken_by_account_id", on_delete: :nullify
   add_foreign_key "reports", "accounts", column: "target_account_id", on_delete: :cascade
   add_foreign_key "reports", "accounts", on_delete: :cascade

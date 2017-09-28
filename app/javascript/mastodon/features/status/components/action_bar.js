@@ -82,12 +82,16 @@ export default class ActionBar extends React.PureComponent {
   render () {
     const { status, me, intl } = this.props;
 
+    const publicStatus = ['public', 'unlisted'].includes(status.get('visibility'));
+
     let menu = [];
 
-    menu.push({ text: intl.formatMessage(messages.embed), action: this.handleEmbed });
+    if (publicStatus) {
+      menu.push({ text: intl.formatMessage(messages.embed), action: this.handleEmbed });
+    }
 
     if (me === status.getIn(['account', 'id'])) {
-      if (['public', 'unlisted'].indexOf(status.get('visibility')) !== -1) {
+      if (publicStatus) {
         menu.push({ text: intl.formatMessage(status.get('pinned') ? messages.unpin : messages.pin), action: this.handlePinClick });
       }
 
@@ -112,7 +116,7 @@ export default class ActionBar extends React.PureComponent {
       <div className='detailed-status__action-bar'>
         <div className='detailed-status__button'><IconButton title={intl.formatMessage(messages.reply)} icon={status.get('in_reply_to_id', null) === null ? 'reply' : 'reply-all'} onClick={this.handleReplyClick} /></div>
         <div className='detailed-status__button'><IconButton disabled={reblog_disabled} active={status.get('reblogged')} title={reblog_disabled ? intl.formatMessage(messages.cannot_reblog) : intl.formatMessage(messages.reblog)} icon={reblogIcon} onClick={this.handleReblogClick} /></div>
-        <div className='detailed-status__button'><IconButton animate active={status.get('favourited')} title={intl.formatMessage(messages.favourite)} icon='star' onClick={this.handleFavouriteClick} activeStyle={{ color: '#ca8f04' }} /></div>
+        <div className='detailed-status__button'><IconButton animate active={status.get('favourited')} title={intl.formatMessage(messages.favourite)} icon='nicoru--status' onClick={this.handleFavouriteClick} activeStyle={{ color: '#ca8f04' }} /></div>
         {shareButton}
 
         <div className='detailed-status__action-bar-dropdown'>

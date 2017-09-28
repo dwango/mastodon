@@ -11,6 +11,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       locale: I18n.locale,
       domain: Rails.configuration.x.local_domain,
       admin: object.admin&.id,
+      admin_announcement: object.admin_announcement || '',
     }
 
     if object.current_account
@@ -19,7 +20,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:boost_modal]    = object.current_account.user.setting_boost_modal
       store[:delete_modal]   = object.current_account.user.setting_delete_modal
       store[:auto_play_gif]  = object.current_account.user.setting_auto_play_gif
-      store[:system_font_ui] = object.current_account.user.setting_system_font_ui
+      store[:nico_url]       = object.current_account.user.nico_url(true)
     end
 
     store

@@ -60,6 +60,7 @@ ja:
       email: E-mail
       feed_url: フィードURL
       followers: フォロワー数
+      followers_url: Followers URL
       follows: フォロー数
       inbox_url: Inbox URL
       ip: IP
@@ -93,6 +94,7 @@ ja:
       resubscribe: 再講読
       salmon_url: Salmon URL
       search: 検索
+      shared_inbox_url: Shared Inbox URL
       show:
         created_reports: このアカウントで作られたレポート
         report: レポート
@@ -141,6 +143,8 @@ ja:
     instances:
       account_count: 既知のアカウント数
       domain_name: ドメイン名
+      reset: リセット
+      search: 検索
       title: 既知のインスタンス
     reports:
       action_taken_by: レポート処理者
@@ -167,6 +171,12 @@ ja:
       unresolved: 未解決
       view: 表示
     settings:
+      admin_announcement:
+        desc_html: トップページの投稿メニューの上に管理者メッセージが表示されます。<br>HTMLタグが利用可能です。
+        title: 管理者からのメッセージ
+      bootstrap_timeline_accounts:
+        desc_html: 複数のユーザー名はコンマで区切ります。ローカルの公開アカウントのみ有効です。指定しない場合は管理者がデフォルトで指定されます。
+        title: 新規ユーザーが自動フォローするアカウント
       contact_information:
         email: ビジネスメールアドレス
         username: 連絡先のユーザー名
@@ -190,6 +200,9 @@ ja:
         desc_html: あなたは独自のプライバシーポリシーや利用規約、そのほかの法的根拠を書くことができます。HTMLタグが使えます
         title: カスタム利用規約
       site_title: インスタンスの名前
+      thumbnail:
+        desc_html: OpenGraphとAPIによるプレビューに使用されます。サイズは1200×630px推奨です。
+        title: インスタンスのサムネイル
       timeline_preview:
         desc_html: ランディングページに公開タイムラインを表示します
         title: タイムラインプレビュー
@@ -287,7 +300,7 @@ ja:
       content: セキュリティ認証に失敗しました。Cookieをブロックしていませんか？
       title: セキュリティ認証に失敗
     '429': リクエストの制限に達しました。
-    noscript: Mastodonのウェブアプリケーションを利用する場合はJavaScriptを有効にしてください。またはあなたのプラットフォーム向けのMastodonネイティブアプリを探すことができます。
+    noscript_html: Mastodonのウェブアプリケーションを利用する場合はJavaScriptを有効にしてください。またはあなたのプラットフォーム向けの<a href="https://github.com/tootsuite/documentation/blob/master/Using-Mastodon/Apps.md">Mastodonネイティブアプリ</a>を探すことができます。
   exports:
     blocks: ブロック
     csv: CSV
@@ -338,8 +351,8 @@ ja:
         one: "新しい1件の通知 \U0001F418"
         other: "新しい%{count}件の通知 \U0001F418"
     favourite:
-      body: 'あなたのトゥートが %{name} さんにお気に入り登録されました:'
-      subject: "%{name} さんがあなたのトゥートをお気に入りに登録しました"
+      body: 'あなたのトゥートが %{name} さんにニコられました:'
+      subject: "%{name} さんがあなたのトゥートをニコりました"
     follow:
       body: "%{name} さんにフォローされています"
       subject: "%{name} さんにフォローされています"
@@ -369,7 +382,7 @@ ja:
     truncate: "&hellip;"
   push_notifications:
     favourite:
-      title: あなたのトゥートが %{name} さんにお気に入り登録されました
+      title: あなたのトゥートが %{name} さんにニコられました
     follow:
       title: "%{name} さんにフォローされました"
     group:
@@ -377,13 +390,10 @@ ja:
     mention:
       action_boost: ブースト
       action_expand: もっと見る
-      action_favourite: お気に入り
+      action_favourite: ニコる
       title: "%{name} さんから返信がありました"
     reblog:
       title: あなたのトゥートが %{name} さんにブーストされました
-    subscribed:
-      body: あなたはプッシュ通知を受け取ることが出来ます
-      title: Subscription が登録されました
   remote_follow:
     acct: あなたの ユーザー名@ドメイン を入力してください
     missing_resource: リダイレクト先が見つかりませんでした
@@ -441,10 +451,15 @@ ja:
     settings: 設定
     two_factor_authentication: 二段階認証
     your_apps: アプリ
+    favourite_tags: お気に入りタグ
+  favourite_tags:
+    name_of_tag: タグ名
+    delete: 削除
   statuses:
     open_in_web: Webで開く
     over_character_limit: 上限は %{max}文字までです
     pin_errors:
+      limit: 固定されているトゥートが多すぎます
       ownership: 他人のトゥートを固定することはできません
       private: 非公開のトゥートを固定することはできません
       reblog: ブーストされたトゥートを固定することはできません

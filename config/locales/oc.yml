@@ -103,6 +103,7 @@ oc:
       title: Comptes
       undo_silenced: Levar lo silenci
       undo_suspension: Levar la suspension
+      unsubscribe: Se desabonar
       username: Nom d’utilizaire
       web: Web
     domain_blocks:
@@ -290,8 +291,8 @@ oc:
     - dissabte
     formats:
       default: "%e/%m/%Y"
-      long: Lo %e %B de %Y
-      short: "%e %b"
+      long: Lo %-d %b de %Y
+      short: "%e %B"
     month_names:
     - 
     - de genièr
@@ -365,7 +366,7 @@ oc:
       content: Verificacion de seguretat fracassada. Blocatz los cookies ?
       title: Verificacion de seguretat fracassada
     '429': Lo servidor mòla (subrecargada)
-    noscript: Per utilizar l’aplicacion Mastodon, mercés d’activar JavaScript. Autrament podètz utilizar una aplicacion nativa Mastodon per vòstra plataforma.
+    noscript_html: Per utilizar l’aplicacion web de Mastodon, mercés d’activar JavaScript. O podètz utilizar <a href="https://github.com/tootsuite/documentation/blob/master/Using-Mastodon/Apps.md">una aplicacion</a> per vòstra plataforma coma alernativa.
   exports:
     blocks: Personas que blocatz
     csv: CSV
@@ -430,6 +431,17 @@ oc:
     reblog:
       body: "%{name} a tornat partejar vòstre estatut :"
       subject: "%{name} a tornat partejar vòstre estatut"
+  number:
+    human:
+      decimal_units:
+        format: "%n%u"
+        units:
+          billion: B
+          million: M
+          quadrillion: Q
+          thousand: K
+          trillion: T
+          unit: ''
   pagination:
     next: Seguent
     prev: Precedent
@@ -448,9 +460,6 @@ oc:
       title: "%{name} vos a mencionat"
     reblog:
       title: "%{name} a partejat vòstre estatut"
-    subscribed:
-      body: Podètz ara recebre las notificacions push.
-      title: Abonament enregistrat !
   remote_follow:
     acct: Picatz vòstre utilizaire@instància que cal utilizar per sègre aqueste utilizaire
     missing_resource: URL de redireccion pas trobada

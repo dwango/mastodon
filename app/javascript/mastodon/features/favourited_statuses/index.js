@@ -70,13 +70,14 @@ export default class Favourites extends ImmutablePureComponent {
     return (
       <Column ref={this.setRef}>
         <ColumnHeader
-          icon='star'
+          icon='nicoru--column'
           title={intl.formatMessage(messages.heading)}
           onPin={this.handlePin}
           onMove={this.handleMove}
           onClick={this.handleHeaderClick}
           pinned={pinned}
           multiColumn={multiColumn}
+          showBackButton
         />
 
         <StatusList

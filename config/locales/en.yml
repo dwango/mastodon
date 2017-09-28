@@ -60,6 +60,7 @@ en:
       email: E-mail
       feed_url: Feed URL
       followers: Followers
+      followers_url: Followers URL
       follows: Follows
       inbox_url: Inbox URL
       ip: IP
@@ -93,6 +94,7 @@ en:
       resubscribe: Resubscribe
       salmon_url: Salmon URL
       search: Search
+      shared_inbox_url: Shared Inbox URL
       show:
         created_reports: Reports created by this account
         report: report
@@ -141,6 +143,8 @@ en:
     instances:
       account_count: Known accounts
       domain_name: Domain
+      reset: Reset
+      search: Search
       title: Known Instances
     reports:
       action_taken_by: Action taken by
@@ -167,6 +171,12 @@ en:
       unresolved: Unresolved
       view: View
     settings:
+      admin_announcement:
+        desc_html: Displayed on frontpage.<br>You can use HTML tags
+        title: Administrator announcement
+      bootstrap_timeline_accounts:
+        desc_html: Separate multiple usernames by comma. Only local and unlocked accounts will work. Default when empty is all local admins.
+        title: Default follows for new users
       contact_information:
         email: Business e-mail
         username: Contact username
@@ -190,6 +200,9 @@ en:
         desc_html: You can write your own privacy policy, terms of service or other legalese. You can use HTML tags
         title: Custom terms of service
       site_title: Instance name
+      thumbnail:
+        desc_html: Used for previews via OpenGraph and API. 1200x630px recommended
+        title: Instance thumbnail
       timeline_preview:
         desc_html: Display public timeline on landing page
         title: Timeline preview
@@ -288,7 +301,7 @@ en:
       content: Security verification failed. Are you blocking cookies?
       title: Security verification failed
     '429': Throttled
-    noscript: To use the Mastodon web application, please enable JavaScript. Alternatively, find a native app for Mastodon for your platform.
+    noscript_html: To use the Mastodon web application, please enable JavaScript. Alternatively, try one of the <a href="https://github.com/tootsuite/documentation/blob/master/Using-Mastodon/Apps.md">native apps</a> for Mastodon for your platform.
   exports:
     blocks: You block
     csv: CSV
@@ -382,9 +395,6 @@ en:
       title: "%{name} mentioned you"
     reblog:
       title: "%{name} boosted your status"
-    subscribed:
-      body: You can now receive push notifications.
-      title: Subscription registered!
   remote_follow:
     acct: Enter your username@domain you want to follow from
     missing_resource: Could not find the required redirect URL for your account
@@ -442,10 +452,15 @@ en:
     settings: Settings
     two_factor_authentication: Two-factor Authentication
     your_apps: Your applications
+    favourite_tags: Favourite tags
+  favourite_tags:
+    name_of_tag: Name of tag
+    delete: delete
   statuses:
     open_in_web: Open in web
     over_character_limit: character limit of %{max} exceeded
     pin_errors:
+      limit: Too many toots pinned
       ownership: Someone else's toot cannot be pinned
       private: Non-public toot cannot be pinned
       reblog: A boost cannot be pinned

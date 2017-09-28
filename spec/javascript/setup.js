@@ -11,3 +11,7 @@ Object.keys(window).forEach(property => {
     global[property] = window[property];
   }
 });
+
+['css', 'scss', 'jpg', 'png', 'gif', 'svg'].forEach(ext => {
+  require.extensions[`.${ext}`] = () => null;
+});

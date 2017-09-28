@@ -5,6 +5,7 @@ import { isRtl } from '../rtl';
 import { FormattedMessage } from 'react-intl';
 import Permalink from './permalink';
 import classnames from 'classnames';
+import EnqueteContainer from '../features/enquete/containers/enquete_content_container';
 
 export default class StatusContent extends React.PureComponent {
 
@@ -36,7 +37,14 @@ export default class StatusContent extends React.PureComponent {
 
       let mention = this.props.status.get('mentions').find(item => link.href === item.get('url'));
 
-      if (mention) {
+      if (link.classList.contains('profile-emoji')) {
+        const accountName = link.getAttribute('data-account-name') || '';
+        const profileEmoji = this.props.status.get('profile_emojis').find(item => accountName === item.get('shortcode'));
+        if (profileEmoji) {
+          link.addEventListener('click', this.onProfileEmojiClick.bind(this, profileEmoji), false);
+          link.setAttribute('title', accountName);
+        }
+      } else if (mention) {
         link.addEventListener('click', this.onMentionClick.bind(this, mention), false);
         link.setAttribute('title', mention.get('acct'));
       } else if (link.textContent[0] === '#' || (link.previousSibling && link.previousSibling.textContent && link.previousSibling.textContent[link.previousSibling.textContent.length - 1] === '#')) {
@@ -71,6 +79,13 @@ export default class StatusContent extends React.PureComponent {
     if (this.context.router && e.button === 0) {
       e.preventDefault();
       this.context.router.history.push(`/timelines/tag/${hashtag}`);
+    }
+  }
+
+  onProfileEmojiClick = (profileEmoji, e) => {
+    if (this.context.router && e.button === 0) {
+      e.preventDefault();
+      this.context.router.history.push(`/accounts/${profileEmoji.get('account_id')}`);
     }
   }
 
@@ -153,10 +168,28 @@ export default class StatusContent extends React.PureComponent {
 
           {mentionsPlaceholder}
 
-          <div tabIndex={!hidden && 0} className={`status__content__text ${!hidden ? 'status__content__text--visible' : ''}`} style={directionStyle} dangerouslySetInnerHTML={content} />
+          {status.get('enquete') ?
+            <div tabIndex={!hidden && 0} className={`status__content__text ${!hidden ? 'status__content__text--visible' : ''}`} style={directionStyle} >
+              <EnqueteContainer status={status} />
+            </div> :
+            <div tabIndex={!hidden && 0} className={`status__content__text ${!hidden ? 'status__content__text--visible' : ''}`} style={directionStyle} dangerouslySetInnerHTML={content} />
+          }
         </div>
       );
     } else if (this.props.onClick) {
+      if (status.get('enquete')) {
+        return (
+          <div
+            ref={this.setRef}
+            className='status__content status__content--with-action'
+            style={directionStyle}
+            onMouseDown={this.handleMouseDown}
+            onMouseUp={this.handleMouseUp}
+          >
+            <EnqueteContainer status={status} />
+          </div>
+        );
+      }
       return (
         <div
           ref={this.setRef}
@@ -170,6 +203,17 @@ export default class StatusContent extends React.PureComponent {
         />
       );
     } else {
+      if (status.get('enquete')) {
+        return (
+          <div
+            ref={this.setRef}
+            className='status__content'
+            style={directionStyle}
+          >
+            <EnqueteContainer status={status} />
+          </div>
+        );
+      }
       return (
         <div
           tabIndex='0'

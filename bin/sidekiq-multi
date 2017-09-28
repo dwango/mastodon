@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+require 'parallel'
+
+concurrency = (ENV['SIDEKIQ_CONCURRENCY'] || 1).to_i
+Parallel.each(1..concurrency, in_processes: concurrency) do |x|
+  `bundle exec sidekiq #{ARGV.join(' ')}`
+end

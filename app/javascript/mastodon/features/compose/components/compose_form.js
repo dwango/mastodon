@@ -20,6 +20,10 @@ import ImmutablePureComponent from 'react-immutable-pure-component';
 import { length } from 'stringz';
 import { countableText } from '../util/counter';
 
+import NicoruImages from '../../../nicoru';
+import EnqueteButtonContainer from '../../enquete/containers/enquete_button_container.js';
+import EnqueteInputsContainer from '../../enquete/containers/enquete_inputs_container.js';
+
 const messages = defineMessages({
   placeholder: { id: 'compose_form.placeholder', defaultMessage: 'What is on your mind?' },
   spoiler_placeholder: { id: 'compose_form.spoiler_placeholder', defaultMessage: 'Write your warning here' },
@@ -52,6 +56,13 @@ export default class ComposeForm extends ImmutablePureComponent {
     onPaste: PropTypes.func.isRequired,
     onPickEmoji: PropTypes.func.isRequired,
     showSearch: PropTypes.bool,
+    onNicoru: PropTypes.func.isRequired,
+    enquete: ImmutablePropTypes.map.isRequired,
+    profileEmojiSuggestionToken: PropTypes.string,
+    profileEmojiSuggestions: ImmutablePropTypes.list,
+    onClearProfileEmojiSuggestions: PropTypes.func.isRequired,
+    onFetchProfileEmojiSuggestions: PropTypes.func.isRequired,
+    onProfileEmojiSuggestionSelected: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -95,6 +106,18 @@ export default class ComposeForm extends ImmutablePureComponent {
     this.props.onChangeSpoilerText(e.target.value);
   }
 
+  onProfileEmojiSuggestionsClearRequested = () => {
+    this.props.onClearProfileEmojiSuggestions();
+  }
+
+  onProfileEmojiSuggestionsFetchRequested = debounce((token) => {
+    this.props.onFetchProfileEmojiSuggestions(token);
+  }, 500, { trailing: true })
+
+  onProfileEmojiSuggestionSelected = (tokenStart, token, value) => {
+    this.props.onProfileEmojiSuggestionSelected(tokenStart, token, value);
+  }
+
   componentWillReceiveProps (nextProps) {
     // If this is the update where we've finished uploading,
     // save the last caret position so we can restore it below!
@@ -129,6 +152,7 @@ export default class ComposeForm extends ImmutablePureComponent {
       this.autosuggestTextarea.textarea.focus();
     } else if(prevProps.is_submitting && !this.props.is_submitting) {
       this.autosuggestTextarea.textarea.focus();
+      this.autosuggestTextarea.textarea.setSelectionRange(0, 0);
     }
   }
 
@@ -143,10 +167,23 @@ export default class ComposeForm extends ImmutablePureComponent {
     this.props.onPickEmoji(position, data);
   }
 
+  handleNicoru = (event) => {
+    event.preventDefault();
+    const position     = this.autosuggestTextarea.textarea.selectionStart;
+    this._restoreCaret = position + ':nicoru:'.length + 1;
+    this.props.onNicoru(position);
+  }
+
   render () {
     const { intl, onPaste, showSearch } = this.props;
     const disabled = this.props.is_submitting;
-    const text     = [this.props.spoiler_text, countableText(this.props.text)].join('');
+    const enquete_items = this.props.enquete.get('items').toArray().join('');
+    const text = [this.props.spoiler_text, countableText(this.props.text)].join('') +
+            (this.props.enquete.get('active') ? enquete_items + 'a'.repeat(150) : '');
+
+    const buttonStyle = {
+      padding: '0 6px',
+    };
 
     let publishText = '';
 
@@ -185,14 +222,26 @@ export default class ComposeForm extends ImmutablePureComponent {
             onSuggestionSelected={this.onSuggestionSelected}
             onPaste={onPaste}
             autoFocus={!showSearch && !isMobile(window.innerWidth)}
+            profileEmojiSuggestions={this.props.profileEmojiSuggestions}
+            onProfileEmojiSuggestionsFetchRequested={this.onProfileEmojiSuggestionsFetchRequested}
+            onProfileEmojiSuggestionsClearRequested={this.onProfileEmojiSuggestionsClearRequested}
+            onProfileEmojiSuggestionSelected={this.onProfileEmojiSuggestionSelected}
           />
 
           <EmojiPickerDropdown onPickEmoji={this.handleEmojiPick} />
+
+          <div style={{ position: 'absolute', right: '7px', top: '35px' }}>
+            <a href='#nicoru' className='emoji-button' onClick={this.handleNicoru}>
+              <img src={NicoruImages.main} alt='nicoru' />
+            </a>
+          </div>
         </div>
 
         <div className='compose-form__modifiers'>
           <UploadFormContainer />
         </div>
+
+        <EnqueteInputsContainer />
 
         <div className='compose-form__buttons-wrapper'>
           <div className='compose-form__buttons'>
@@ -200,11 +249,12 @@ export default class ComposeForm extends ImmutablePureComponent {
             <PrivacyDropdownContainer />
             <SensitiveButtonContainer />
             <SpoilerButtonContainer />
+            <EnqueteButtonContainer />
           </div>
 
           <div className='compose-form__publish'>
             <div className='character-counter__wrapper'><CharacterCounter max={500} text={text} /></div>
-            <div className='compose-form__publish-button-wrapper'><Button text={publishText} onClick={this.handleSubmit} disabled={disabled || this.props.is_uploading || length(text) > 500 || (text.length !== 0 && text.trim().length === 0)} block /></div>
+            <div className='compose-form__publish-button-wrapper'><Button text={publishText} style={buttonStyle} onClick={this.handleSubmit} disabled={disabled || this.props.is_uploading || length(text) > 500 || (text.length !== 0 && text.trim().length === 0) || (this.props.enquete.get('active') && this.props.text.length !== 0 && this.props.text.trim().length === 0)} block /></div>
           </div>
         </div>
       </div>

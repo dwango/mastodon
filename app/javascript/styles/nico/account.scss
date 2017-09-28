@@ -1,0 +1,68 @@
+/**
+  * accountButton Component Styles
+  */
+.nico-account-button {
+  position: absolute;
+  width: $icon-size--nico;
+  height: $icon-size--nico;
+  left: 50%;
+  transform: translate(-45px, -$icon-size--nico);
+  z-index: 999;
+
+  &--large {
+    width: $icon-size--nico--large;
+    height: $icon-size--nico--large;
+    transform: translate(-60px, -$icon-size--nico--large);
+
+    &__icon {
+      @include icon--nico($icon-size--nico--large);
+    }
+  }
+
+  &__icon {
+    @include icon--nico;
+  }
+}
+
+/**
+ * ConnectAccount Component Styles
+ */
+$connect-account--margin: 10px;
+
+.nico-connect-account {
+  position: relative;
+  width: 100%;
+  height: $icon-size--nico;
+  padding: 0 $connect-account--margin;
+  margin: $connect-account--margin 0;
+  box-sizing: border-box;
+
+  a {
+    cursor: pointer;
+    color: #9baec8;
+    text-decoration: none;
+  }
+
+  &__label {
+    line-height: $icon-size--nico;
+    padding-left: $icon-size--nico + 5;
+    font-weight: 600;
+
+    &::before {
+      @include icon--nico;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: $connect-account--margin;
+      transition: opacity .18s ease-out;
+    }
+
+    &:hover::before {
+      opacity: 1.0;
+    }
+
+    &--disabled::before {
+      opacity: .48;
+    }
+  }
+}

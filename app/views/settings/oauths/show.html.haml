@@ -1,0 +1,18 @@
+- content_for :page_title do
+  niconicoアカウント連携
+
+- if current_user.uid?
+
+  = simple_form_for current_user, url: settings_oauth_path, html: { method: :put } do |f|
+    .fields-group
+      = f.input :hide_oauth, as: :boolean, wrapper: :with_label
+
+    .actions
+      = f.button :button, t('generic.save_changes'), type: :submit
+
+  = simple_form_for current_user, url: settings_oauth_path, html: { method: :delete, style: 'margin-top: 330px' } do |f|
+    = f.button :button, 'niconico連携を解除する', type: :submit
+
+- else
+  = simple_form_for current_user, url: user_niconico_omniauth_authorize_path, html: { method: :get } do |f|
+    = f.button :button, 'アカウント連携', type: :submit

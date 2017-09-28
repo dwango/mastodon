@@ -73,7 +73,7 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
 
   # E-mails
-  config.action_mailer.default_options = { from: ENV.fetch('SMTP_FROM_ADDRESS') }
+  config.action_mailer.default_options = { from: ENV.fetch('SMTP_FROM_ADDRESS', 'notifications@localhost') }
 
   config.action_mailer.smtp_settings = {
     :port                 => ENV['SMTP_PORT'],
@@ -101,4 +101,15 @@ Rails.application.configure do
     'X-Content-Type-Options' => 'nosniff',
     'X-XSS-Protection'       => '1; mode=block',
   }
+
+  if ENV['SLACK_NOTIFIER_URL'] && ENV['SLACK_NOTIFIER_CHANNEL'] && ENV['SLACK_NOTIFIER_USER']
+    config.middleware.use ExceptionNotification::Rack, slack: {
+                            webhook_url: ENV['SLACK_NOTIFIER_URL'],
+                            channel: "##{ENV['SLACK_NOTIFIER_CHANNEL']}",
+                            username: ENV['SLACK_NOTIFIER_USER'],
+                            additional_parameters: {
+                              icon_emoji: ':elephant:'
+                            }
+                          }
+  end
 end

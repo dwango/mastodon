@@ -11,3 +11,5 @@ class ProcessHashtagsService < BaseService
     status.update(sensitive: true) if tags.include?('nsfw')
   end
 end
+
+ProcessHashtagsService.prepend(Friends::ProcessHashtagsService)

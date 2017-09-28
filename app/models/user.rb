@@ -30,6 +30,9 @@
 #  otp_required_for_login    :boolean          default(FALSE), not null
 #  last_emailed_at           :datetime
 #  otp_backup_codes          :string           is an Array
+#  provider                  :string
+#  uid                       :string
+#  hide_oauth                :boolean          default(FALSE)
 #  filtered_languages        :string           default([]), not null, is an Array
 #
 
@@ -40,6 +43,7 @@ class User < ApplicationRecord
   devise :registerable, :recoverable,
          :rememberable, :trackable, :validatable, :confirmable,
          :two_factor_authenticatable, :two_factor_backupable,
+         :omniauthable,
          otp_secret_encryption_key: ENV['OTP_SECRET'],
          otp_number_of_backup_codes: 10
 
@@ -151,3 +155,5 @@ class User < ApplicationRecord
     filtered_languages.reject!(&:blank?)
   end
 end
+
+User.include(Friends::UserExtension)

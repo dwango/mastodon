@@ -27,6 +27,7 @@ Rails.application.routes.draw do
     registrations:      'auth/registrations',
     passwords:          'auth/passwords',
     confirmations:      'auth/confirmations',
+    omniauth_callbacks: 'auth/omniauth_callbacks'
   }
 
   get '/users/:username', to: redirect('/@%{username}'), constraints: lambda { |req| req.format.nil? || req.format.html? }
@@ -93,10 +94,15 @@ Rails.application.routes.draw do
     resource :delete, only: [:show, :destroy]
 
     resources :sessions, only: [:destroy]
+
+    resource :oauth, only: [:show, :update, :destroy]
+    resources :favourite_tags, only: [:index, :create, :destroy]
   end
 
   resources :media, only: [:show]
   resources :tags,  only: [:show]
+
+  get '/media_proxy/:id/(*any)', to: 'media_proxy#show', as: :media_proxy
 
   # Remote follow
   resource :authorize_follow, only: [:show, :create]
@@ -233,6 +239,9 @@ Rails.application.routes.draw do
           post :unmute
         end
       end
+
+      resources :favourite_tags, only: [:index, :create, :destroy]
+      post '/votes/:status_id', to: 'votes#create'
     end
 
     namespace :web do

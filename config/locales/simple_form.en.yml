@@ -47,6 +47,7 @@ en:
         severity: Severity
         type: Import type
         username: Username
+        hide_oauth: Hide niconico Account
       interactions:
         must_be_follower: Block notifications from non-followers
         must_be_following: Block notifications from people you don't follow

@@ -27,9 +27,11 @@ class PostStatusService < BaseService
                                         thread: in_reply_to,
                                         sensitive: options[:sensitive],
                                         spoiler_text: options[:spoiler_text] || '',
-                                        visibility: options[:visibility],
-                                        language: detect_language_for(text, account),
-                                        application: options[:application])
+                                        visibility: options[:visibility] || account.user&.setting_default_privacy,
+                                        language: LanguageDetector.instance.detect(text, account),
+                                        application: options[:application],
+                                        enquete: options[:enquete])
+
       attach_media(status, media)
     end
 
@@ -66,10 +68,6 @@ class PostStatusService < BaseService
   def attach_media(status, media)
     return if media.nil?
     media.update(status_id: status.id)
-  end
-
-  def detect_language_for(text, account)
-    LanguageDetector.new(text, account).to_iso_s
   end
 
   def process_mentions_service

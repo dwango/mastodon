@@ -1,3 +1,4 @@
+# coding: utf-8
 # frozen_string_literal: true
 
 SimpleNavigation::Configuration.run do |navigation|
@@ -13,6 +14,8 @@ SimpleNavigation::Configuration.run do |navigation|
       settings.item :export, safe_join([fa_icon('cloud-download fw'), t('settings.export')]), settings_export_url
       settings.item :authorized_apps, safe_join([fa_icon('list fw'), t('settings.authorized_apps')]), oauth_authorized_applications_url
       settings.item :follower_domains, safe_join([fa_icon('users fw'), t('settings.followers')]), settings_follower_domains_url
+      settings.item :nico_account, safe_join([fa_icon('nico'), 'niconicoアカウント連携']), settings_oauth_url
+      settings.item :favourite_tags, safe_join([fa_icon('tag'), t('settings.favourite_tags')]), settings_favourite_tags_url
     end
 
     primary.item :development, safe_join([fa_icon('code fw'), t('settings.development')]), settings_applications_url do |development|

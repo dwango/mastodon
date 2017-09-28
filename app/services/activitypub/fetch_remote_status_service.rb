@@ -17,6 +17,8 @@ class ActivityPub::FetchRemoteStatusService < BaseService
     actor = ActivityPub::TagManager.instance.uri_to_resource(actor_id, Account)
     actor = ActivityPub::FetchRemoteAccountService.new.call(actor_id) if actor.nil?
 
+    return if actor.suspended?
+
     ActivityPub::Activity.factory(activity, actor).perform
   end
 
@@ -25,8 +27,8 @@ class ActivityPub::FetchRemoteStatusService < BaseService
   def activity_json
     if %w(Note Article).include? @json['type']
       {
-        'type' => 'Create',
-        'actor' => first_of_value(@json['attributedTo']),
+        'type'   => 'Create',
+        'actor'  => first_of_value(@json['attributedTo']),
         'object' => @json,
       }
     else

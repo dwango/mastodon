@@ -22,7 +22,12 @@ import {
   COMPOSE_VISIBILITY_CHANGE,
   COMPOSE_COMPOSING_CHANGE,
   COMPOSE_EMOJI_INSERT,
+  COMPOSE_NICORU_INSERT,
+  COMPOSE_PROFILE_EMOJI_SUGGESTIONS_CLEAR,
+  COMPOSE_PROFILE_EMOJI_SUGGESTIONS_READY,
+  COMPOSE_PROFILE_EMOJI_SUGGESTION_SELECT,
 } from '../actions/compose';
+import { COMPOSE_LOCK_TAG } from '../actions/favourite_tags';
 import { TIMELINE_DELETE } from '../actions/timelines';
 import { STORE_HYDRATE } from '../actions/store';
 import { Map as ImmutableMap, List as ImmutableList, OrderedSet as ImmutableOrderedSet, fromJS } from 'immutable';
@@ -50,6 +55,9 @@ const initialState = ImmutableMap({
   default_sensitive: false,
   resetFileKey: Math.floor((Math.random() * 0x10000)),
   idempotencyKey: null,
+  defaultText: '',
+  profile_emoji_suggestion_token: null,
+  profile_emoji_suggestions: ImmutableList(),
 });
 
 function statusToTextMentions(state, status) {
@@ -64,8 +72,9 @@ function statusToTextMentions(state, status) {
 };
 
 function clearAll(state) {
+  const defaultText = state.get('defaultText');
   return state.withMutations(map => {
-    map.set('text', '');
+    map.set('text', defaultText === '' ? '' : ` ${defaultText}`);
     map.set('spoiler', false);
     map.set('spoiler_text', '');
     map.set('is_submitting', false);
@@ -129,6 +138,22 @@ const insertEmoji = (state, position, emojiData) => {
   });
 };
 
+const insertNicoru = (state, position) => {
+  const nicoru = ':nicoru:';
+  return state.withMutations(map => {
+    map.update('text', oldText => `${oldText.slice(0, position)}${nicoru} ${oldText.slice(position)}`);
+    map.set('focusDate', new Date());
+  });
+};
+
+const setDefaultText = (state, text) => {
+  const replaceRE = new RegExp(` *${state.get('defaultText')}`);
+  return state.withMutations(map => {
+    map.update('text', oldText => oldText.replace(replaceRE, '') + (text === '' ? '' : ` ${text}`));
+    map.set('defaultText', text);
+  });
+};
+
 const privacyPreference = (a, b) => {
   if (a === 'direct' || b === 'direct') {
     return 'direct';
@@ -149,6 +174,26 @@ const hydrate = (state, hydratedState) => {
   }
 
   return state;
+};
+
+const setProfileEmojiSuggestions = (state, accounts, token) => {
+  return state
+    .set('profile_emoji_suggestions', fromJS(accounts.map(account => ({
+      shortcode: `@${account.acct}`,
+      url: account.avatar_static,
+      original_url: account.avatar,
+    }))))
+    .set('profile_emoji_suggestion_token', token);
+};
+
+const insertProfileEmojiSuggestion = (state, position, token, completion) => {
+  return state.withMutations(map => {
+    map.update('text', oldText => `${oldText.slice(0, position)}${completion}:${oldText.slice(position + token.length + 1)}`);
+    map.set('profile_emoji_suggestion_token', null);
+    map.update('profile_emoji_suggestions', ImmutableList(), list => list.clear());
+    map.set('focusDate', new Date());
+    map.set('idempotencyKey', uuid());
+  });
 };
 
 export default function compose(state = initialState, action) {
@@ -256,6 +301,18 @@ export default function compose(state = initialState, action) {
     }
   case COMPOSE_EMOJI_INSERT:
     return insertEmoji(state, action.position, action.emoji);
+  case COMPOSE_NICORU_INSERT:
+    return insertNicoru(state, action.position);
+  case COMPOSE_LOCK_TAG:
+    return setDefaultText(state, action.tag);
+  case COMPOSE_PROFILE_EMOJI_SUGGESTIONS_CLEAR:
+    return state
+      .update('profile_emoji_suggestions', ImmutableList(), list => list.clear())
+      .set('profile_emoji_suggestion_token', null);
+  case COMPOSE_PROFILE_EMOJI_SUGGESTIONS_READY:
+    return setProfileEmojiSuggestions(state, action.accounts, action.token);
+  case COMPOSE_PROFILE_EMOJI_SUGGESTION_SELECT:
+    return insertProfileEmojiSuggestion(state, action.position, action.token, action.completion);
   default:
     return state;
   }

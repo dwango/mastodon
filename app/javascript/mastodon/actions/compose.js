@@ -1,6 +1,11 @@
 import api from '../api';
 
-import { updateTimeline } from './timelines';
+import {
+  updateTimeline,
+  refreshHomeTimeline,
+  refreshCommunityTimeline,
+  refreshPublicTimeline,
+} from './timelines';
 
 export const COMPOSE_CHANGE          = 'COMPOSE_CHANGE';
 export const COMPOSE_SUBMIT_REQUEST  = 'COMPOSE_SUBMIT_REQUEST';
@@ -30,6 +35,11 @@ export const COMPOSE_LISTABILITY_CHANGE = 'COMPOSE_LISTABILITY_CHANGE';
 export const COMPOSE_COMPOSING_CHANGE = 'COMPOSE_COMPOSING_CHANGE';
 
 export const COMPOSE_EMOJI_INSERT = 'COMPOSE_EMOJI_INSERT';
+export const COMPOSE_NICORU_INSERT = 'COMPOSE_NICORU_INSERT';
+
+export const COMPOSE_PROFILE_EMOJI_SUGGESTIONS_CLEAR = 'COMPOSE_PROFILE_EMOJI_SUGGESTIONS_CLEAR';
+export const COMPOSE_PROFILE_EMOJI_SUGGESTIONS_READY = 'COMPOSE_PROFILE_EMOJI_SUGGESTIONS_READY';
+export const COMPOSE_PROFILE_EMOJI_SUGGESTION_SELECT = 'COMPOSE_PROFILE_EMOJI_SUGGESTION_SELECT';
 
 export function changeCompose(text) {
   return {
@@ -73,9 +83,19 @@ export function mentionCompose(account, router) {
 export function submitCompose() {
   return function (dispatch, getState) {
     const status = getState().getIn(['compose', 'text'], '');
-
+    const isEnquete = getState().getIn(['enquetes', 'active']);
+    const enquete_items = getState().getIn(['enquetes', 'items']).toArray();
     if (!status || !status.length) {
       return;
+    }
+
+    //if its enquete and there is 0 or 1 item, it will be denied
+    if (isEnquete && (enquete_items.filter(item => item !== '').length < 2)){
+      return;
+    }
+
+    if (status.match(/^\s*[@＠]ピザ\s*/)) {
+      window.open('http://info.nicovideo.jp/pizza/', null);
     }
 
     dispatch(submitComposeRequest());
@@ -87,6 +107,8 @@ export function submitCompose() {
       sensitive: getState().getIn(['compose', 'sensitive']),
       spoiler_text: getState().getIn(['compose', 'spoiler_text'], ''),
       visibility: getState().getIn(['compose', 'privacy']),
+      isEnquete: isEnquete,
+      enquete_items: enquete_items,
     }, {
       headers: {
         'Idempotency-Key': getState().getIn(['compose', 'idempotencyKey']),
@@ -95,16 +117,20 @@ export function submitCompose() {
       dispatch(submitComposeSuccess({ ...response.data }));
 
       // To make the app more responsive, immediately get the status into the columns
-      dispatch(updateTimeline('home', { ...response.data }));
+
+      const insertOrRefresh = (timelineId, refreshAction) => {
+        if (getState().getIn(['timelines', timelineId, 'online'])) {
+          dispatch(updateTimeline(timelineId, { ...response.data }));
+        } else if (getState().getIn(['timelines', timelineId, 'loaded'])) {
+          dispatch(refreshAction());
+        }
+      };
+
+      insertOrRefresh('home', refreshHomeTimeline);
 
       if (response.data.in_reply_to_id === null && response.data.visibility === 'public') {
-        if (getState().getIn(['timelines', 'community', 'loaded'])) {
-          dispatch(updateTimeline('community', { ...response.data }));
-        }
-
-        if (getState().getIn(['timelines', 'public', 'loaded'])) {
-          dispatch(updateTimeline('public', { ...response.data }));
-        }
+        insertOrRefresh('community', refreshCommunityTimeline);
+        insertOrRefresh('public', refreshPublicTimeline);
       }
     }).catch(function (error) {
       dispatch(submitComposeFail(error));
@@ -204,7 +230,6 @@ export function fetchComposeSuggestions(token) {
     api(getState).get('/api/v1/accounts/search', {
       params: {
         q: token,
-        resolve: false,
         limit: 4,
       },
     }).then(response => {
@@ -231,6 +256,43 @@ export function selectComposeSuggestion(position, token, accountId) {
       token,
       completion,
     });
+  };
+};
+
+export function clearProfileEmojiSuggestions() {
+  return {
+    type: COMPOSE_PROFILE_EMOJI_SUGGESTIONS_CLEAR,
+  };
+};
+
+export function fetchProfileEmojiSuggestions(token) {
+  return (dispatch, getState) => {
+    api(getState).get('/api/v1/accounts/search', {
+      params: {
+        q: token,
+        resolve: false,
+        limit: 4,
+      },
+    }).then(response => {
+      dispatch(readyProfileEmojiSuggestions(token, response.data));
+    });
+  };
+};
+
+export function readyProfileEmojiSuggestions(token, accounts) {
+  return {
+    type: COMPOSE_PROFILE_EMOJI_SUGGESTIONS_READY,
+    token,
+    accounts,
+  };
+};
+
+export function selectProfileEmojiSuggestion(position, token, completion) {
+  return {
+    type: COMPOSE_PROFILE_EMOJI_SUGGESTION_SELECT,
+    position,
+    token,
+    completion,
   };
 };
 
@@ -277,6 +339,13 @@ export function insertEmojiCompose(position, emoji) {
     type: COMPOSE_EMOJI_INSERT,
     position,
     emoji,
+  };
+};
+
+export function insertNicoruCompose(position) {
+  return {
+    type: COMPOSE_NICORU_INSERT,
+    position,
   };
 };
 

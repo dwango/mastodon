@@ -10,7 +10,7 @@ import ComposeForm from '../../compose/components/compose_form';
 import Search from '../../compose/components/search';
 import NavigationBar from '../../compose/components/navigation_bar';
 import ColumnHeader from './column_header';
-import { List as ImmutableList } from 'immutable';
+import { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 const noop = () => { };
 
@@ -40,6 +40,12 @@ PageOne.propTypes = {
   domain: PropTypes.string.isRequired,
 };
 
+const enquete = ImmutableMap({
+  active: false,
+  items: ImmutableList(['', '', '', '']),
+});
+
+
 const PageTwo = ({ me }) => (
   <div className='onboarding-modal__page onboarding-modal__page-two'>
     <div className='figure non-interactive'>
@@ -47,19 +53,18 @@ const PageTwo = ({ me }) => (
         <NavigationBar account={me} />
       </div>
       <ComposeForm
-        text='Awoo! #introductions'
+        text='新規です! ニコってください!'
         suggestions={ImmutableList()}
         mentionedDomains={[]}
         spoiler={false}
-        onChange={noop}
-        onSubmit={noop}
-        onPaste={noop}
         onPickEmoji={noop}
+        onNicoru={noop}
         onChangeSpoilerText={noop}
         onClearSuggestions={noop}
         onFetchSuggestions={noop}
         onSuggestionSelected={noop}
         showSearch
+        enquete={enquete}
       />
     </div>
 

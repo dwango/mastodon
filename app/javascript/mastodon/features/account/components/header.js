@@ -3,6 +3,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import IconButton from '../../../components/icon_button';
+import AccountButton from '../../niconico/components/account_button';
 import Motion from 'react-motion/lib/Motion';
 import spring from 'react-motion/lib/spring';
 import { connect } from 'react-redux';
@@ -11,7 +12,7 @@ import ImmutablePureComponent from 'react-immutable-pure-component';
 const messages = defineMessages({
   unfollow: { id: 'account.unfollow', defaultMessage: 'Unfollow' },
   follow: { id: 'account.follow', defaultMessage: 'Follow' },
-  requested: { id: 'account.requested', defaultMessage: 'Awaiting approval' },
+  requested: { id: 'account.requested', defaultMessage: 'Awaiting approval. Click to cancel follow request' },
 });
 
 const makeMapStateToProps = () => {
@@ -48,24 +49,27 @@ class Avatar extends ImmutablePureComponent {
     const { isHovered } = this.state;
 
     return (
-      <Motion defaultStyle={{ radius: 90 }} style={{ radius: spring(isHovered ? 30 : 90, { stiffness: 180, damping: 12 }) }}>
-        {({ radius }) =>
-          <a
-            href={account.get('url')}
-            className='account__header__avatar'
-            role='presentation'
-            target='_blank'
-            rel='noopener'
-            style={{ borderRadius: `${radius}px`, backgroundImage: `url(${autoPlayGif || isHovered ? account.get('avatar') : account.get('avatar_static')})` }}
-            onMouseOver={this.handleMouseOver}
-            onMouseOut={this.handleMouseOut}
-            onFocus={this.handleMouseOver}
-            onBlur={this.handleMouseOut}
-          >
-            <span style={{ display: 'none' }}>{account.get('acct')}</span>
-          </a>
-        }
-      </Motion>
+      <div>
+        <Motion defaultStyle={{ radius: 90 }} style={{ radius: spring(isHovered ? 30 : 90, { stiffness: 180, damping: 12 }) }}>
+          {({ radius }) =>
+            <a
+              href={account.get('url')}
+              className='account__header__avatar'
+              role='presentation'
+              target='_blank'
+              rel='noopener'
+              style={{ borderRadius: `${radius}px`, backgroundImage: `url(${autoPlayGif || isHovered ? account.get('avatar') : account.get('avatar_static')})` }}
+              onMouseOver={this.handleMouseOver}
+              onMouseOut={this.handleMouseOut}
+              onFocus={this.handleMouseOver}
+              onBlur={this.handleMouseOut}
+            >
+              <span style={{ display: 'none' }}>{account.get('acct')}</span>
+            </a>
+          }
+        </Motion>
+        <AccountButton account={account} />
+      </div>
     );
   }
 
@@ -102,7 +106,7 @@ export default class Header extends ImmutablePureComponent {
       if (account.getIn(['relationship', 'requested'])) {
         actionBtn = (
           <div className='account--action-button'>
-            <IconButton size={26} disabled icon='hourglass' title={intl.formatMessage(messages.requested)} />
+            <IconButton size={26} active icon='hourglass' title={intl.formatMessage(messages.requested)} onClick={this.props.onFollow} />
           </div>
         );
       } else if (!account.getIn(['relationship', 'blocking'])) {

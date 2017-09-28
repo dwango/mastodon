@@ -1,3 +1,22 @@
+friends.nico
+=======
+
+friends.nicoへようこそ！
+ここは、ニコニコが運営するMastodonインスタンスのオープンソースコードです。
+
+詳しい説明などは[ニコニコ大百科](http://dic.nicovideo.jp/a/friends.nico)にて
+
+## 開発者向け
+
+- .env にダミーとして `OMNIAUTH=niconico:key:secret` を追加しておく必要があります
+- OAuthは今のところ一般開放されてないのでニコニコ連携のテストはできません
+
+### 主な変更点
+
+- niconico連携機能
+- お気に入りをニコるに
+- sm9 などをリンクに
+
 ![Mastodon](https://i.imgur.com/NhZc40l.png)
 ========
 
@@ -47,7 +66,7 @@ If you would like, you can [support the development of this project on Patreon][
   Mastodon tries to be as fast and responsive as possible, so all long-running tasks that can be delegated to background processing, are
 - **Deployable via Docker**
   You don't need to mess with dependencies and configuration if you want to try Mastodon, if you have Docker and Docker Compose the deployment is extremely easy
-  
+
 ## Development
 
 Please follow the [development guide](https://github.com/tootsuite/documentation/blob/master/Running-Mastodon/Development-guide.md) from the documentation repository.

@@ -9,17 +9,21 @@ class Rack::Attack
   end
 
   # Rate limits for the API
-  throttle('api', limit: 300, period: 5.minutes) do |req|
+  throttle('api', limit: 3_000_000, period: 5.minutes) do |req|
     req.ip if req.path =~ /\A\/api\/v/
   end
 
+  throttle('toot', limit: 150, period: 5.minutes) do |req|
+    req.env['HTTP_AUTHORIZATION'].split(' ').last if req.path == '/api/v1/statuses' && req.post?
+  end
+
   # Rate limit logins
-  throttle('login', limit: 5, period: 5.minutes) do |req|
+  throttle('login', limit: 500, period: 5.minutes) do |req|
     req.ip if req.path == '/auth/sign_in' && req.post?
   end
 
   # Rate limit sign-ups
-  throttle('register', limit: 5, period: 5.minutes) do |req|
+  throttle('register', limit: 50, period: 5.minutes) do |req|
     req.ip if req.path == '/auth' && req.post?
   end
 
