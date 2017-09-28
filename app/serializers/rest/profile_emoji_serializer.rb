@@ -16,6 +16,6 @@ class REST::ProfileEmojiSerializer < ActiveModel::Serializer
   end
 
   def account_url
-    object.url
+    object.local? ? short_account_url(object) : object.url
   end
 end
