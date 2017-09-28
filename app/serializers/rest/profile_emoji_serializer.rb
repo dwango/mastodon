@@ -4,7 +4,7 @@ class REST::ProfileEmojiSerializer < ActiveModel::Serializer
   attributes :shortcode, :account_id, :url, :account_url
 
   def shortcode
-    object.username
+    object.acct
   end
 
   def account_id
@@ -16,6 +16,6 @@ class REST::ProfileEmojiSerializer < ActiveModel::Serializer
   end
 
   def account_url
-    short_account_url(object)
+    object.url
   end
 end

@@ -179,7 +179,7 @@ const hydrate = (state, hydratedState) => {
 const setProfileEmojiSuggestions = (state, accounts, token) => {
   return state
     .set('profile_emoji_suggestions', fromJS(accounts.map(account => ({
-      shortcode: `@${account.username}`,
+      shortcode: `@${account.acct}`,
       url: account.avatar_static,
       original_url: account.avatar,
     }))))
