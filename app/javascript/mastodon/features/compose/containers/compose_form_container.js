@@ -10,6 +10,9 @@ import {
   changeComposeSpoilerText,
   insertEmojiCompose,
   insertNicoruCompose,
+  clearProfileEmojiSuggestions,
+  fetchProfileEmojiSuggestions,
+  selectProfileEmojiSuggestion,
 } from '../../../actions/compose';
 
 const mapStateToProps = state => ({
@@ -26,6 +29,8 @@ const mapStateToProps = state => ({
   me: state.getIn(['compose', 'me']),
   showSearch: state.getIn(['search', 'submitted']) && !state.getIn(['search', 'hidden']),
   enquete: state.get('enquetes'),
+  profileEmojiSuggestionToken: state.getIn(['compose', 'profile_emoji_suggestion_token']),
+  profileEmojiSuggestions: state.getIn(['compose', 'profile_emoji_suggestions']),
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -64,6 +69,18 @@ const mapDispatchToProps = (dispatch) => ({
 
   onNicoru (position) {
     dispatch(insertNicoruCompose(position));
+  },
+
+  onClearProfileEmojiSuggestions () {
+    dispatch(clearProfileEmojiSuggestions());
+  },
+
+  onFetchProfileEmojiSuggestions (token) {
+    dispatch(fetchProfileEmojiSuggestions(token));
+  },
+
+  onProfileEmojiSuggestionSelected (position, token, completion) {
+    dispatch(selectProfileEmojiSuggestion(position, token, completion));
   },
 
 });

@@ -5,7 +5,8 @@ class REST::AccountSerializer < ActiveModel::Serializer
 
   attributes :id, :username, :acct, :display_name, :locked, :created_at,
              :note, :url, :avatar, :avatar_static, :header, :header_static,
-             :followers_count, :following_count, :statuses_count, :nico_url
+             :followers_count, :following_count, :statuses_count, :nico_url,
+             :profile_emojis
 
   def note
     Formatter.instance.simplified_format(object)
