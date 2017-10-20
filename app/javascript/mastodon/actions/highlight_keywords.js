@@ -93,6 +93,25 @@ export function refreshHighlightKeywordsSuccess(keywords) {
   };
 }
 
+const ReplaceWith = function(Ele) {
+  'use-strict'; // For safari, and IE > 10
+  const parent = this.parentNode;
+  let i = arguments.length;
+  const firstIsNode = +(parent && typeof Ele === 'object');
+  if (!parent) return;
+
+  while (i-- > firstIsNode){
+    if (parent && typeof arguments[i] !== 'object'){
+      arguments[i] = document.createTextNode(arguments[i]);
+    } if (!parent && arguments[i].parentNode){
+      arguments[i].parentNode.removeChild(arguments[i]);
+      continue;
+    }
+    parent.insertBefore(this.previousSibling, arguments[i]);
+  }
+  if (firstIsNode) parent.replaceChild(this, Ele);
+};
+
 const replaceHighlight = (reg, node) => {
   for (let i = 0; i < node.childNodes.length; i++) {
     const target = node.childNodes[i];
@@ -100,7 +119,11 @@ const replaceHighlight = (reg, node) => {
       const span = document.createElement('span');
       span.innerHTML = escapeHTML(target.textContent)
         .replace(reg, '<span class="highlight">$1</span>');
-      target.replaceWith.apply(target, span.childNodes);
+      if(!target.replaceWith) {
+        ReplaceWith.apply(target, span.childNodes);
+      } else {
+        target.replaceWith.apply(target, span.childNodes);
+      }
     } else {
       replaceHighlight(reg, target);
     }
