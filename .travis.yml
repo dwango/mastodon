@@ -40,8 +40,6 @@ services:
   - redis-server
 
 install:
-  - echo $TRAVIS_BRANCH
-  - env
   - nvm install
   - npm install -g yarn
   - bundle install --path=vendor/bundle --without development production --retry=3 --jobs=16
@@ -58,6 +56,7 @@ script:
   - bundle exec i18n-tasks check-normalized && bundle exec i18n-tasks unused
 
 after_success:
+  - bundle install --path vendor/bundle --with production --without development test --retry=3 --jobs=16
   - gem install mamiya
   - mamiya build
   - ls ./build
