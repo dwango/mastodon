@@ -58,3 +58,4 @@ script:
 after_success:
   - gem install mamiya
   - mamiya build
+  - ls ./build
