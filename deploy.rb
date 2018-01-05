@@ -4,7 +4,7 @@ require 'pathname'
 
 set :application, 'mastodon'
 
-set :exclude_from_package, ['tmp', 'log', 'spec', '.sass-cache', 'build']
+set :exclude_from_package, ['tmp', 'log', 'spec', '.sass-cache', 'build', 'public/system', 'public/pack-test', '.env', '.env.production', 'db/*.sqlite3', 'db/*.sqlite3-journal', 'coverage']
 set :dereference_symlinks, true
 
 set :build_from, '.'
