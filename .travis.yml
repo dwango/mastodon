@@ -40,6 +40,8 @@ services:
   - redis-server
 
 install:
+  - echo $TRAVIS_BRANCH
+  - env
   - nvm install
   - npm install -g yarn
   - bundle install --path=vendor/bundle --without development production --retry=3 --jobs=16
