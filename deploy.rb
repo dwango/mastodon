@@ -14,9 +14,7 @@ Dir.mkdir build_to unless File.exist?(build_to)
 
 fake_env = {
   'RAILS_ENV' => 'production',
-  'PAPERCLIP_SECRET' => SecureRandom.hex,
   'SECRET_KEY_BASE' => SecureRandom.hex,
-  'OTP_SECRET' => SecureRandom.hex
 }
 
 set :bundle_without, [:development, :test]
