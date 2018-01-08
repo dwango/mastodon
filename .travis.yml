@@ -58,5 +58,4 @@ script:
 after_success:
   - bundle install --path vendor/bundle --with production --without development test --retry=3 --jobs=16
   - gem install mamiya
-  - mamiya build
-  - ls ./build
+  - mamiya build --push
