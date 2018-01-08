@@ -56,6 +56,7 @@ script:
   - bundle exec i18n-tasks check-normalized && bundle exec i18n-tasks unused
 
 after_success:
+  - echo $MAMIYA_S3_BUCKET
   - bundle install --path vendor/bundle --with production --without development test --retry=3 --jobs=16
   - gem install mamiya
   - mamiya build --push
