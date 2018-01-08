@@ -1,3 +1,5 @@
+p ENV['MAMIYA_AWS_ACCESS_KEY_ID']
+
 set :storage, {
       type: :s3,
       bucket: ENV['MAMIYA_S3_BUCKET'],
