@@ -27,6 +27,9 @@
   ip_cleanup_scheduler:
     cron: '<%= Random.rand(0..59) %> <%= Random.rand(3..5) %> * * *'
     class: Scheduler::IpCleanupScheduler
+  statuses_count_writeback_scheduler:
+    cron: '*/5 * * * *'
+    class: Scheduler::StatusesCountWritebackScheduler
   nicovieo_ranking_scheduler:
     cron: '*/10 * * * *'
     class: Scheduler::NicovideoRankingScheduler
