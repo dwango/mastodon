@@ -15,4 +15,16 @@ RSpec.describe Api::V1::CustomEmojisController, type: :controller do
       expect(response).to have_http_status(:success)
     end
   end
+
+  describe 'DELETE #destroy' do
+    let(:user) { Fabricate(:user, admin: true) }
+    before { sign_in user }
+    let!(:custom_emoji) { Fabricate(:custom_emoji) }
+    subject { delete :destroy, params: { id: custom_emoji.shortcode }  }
+    it { expect { subject }.to change { CustomEmoji.count }.by(-1) }
+    it do
+      subject
+      expect(response).to have_http_status(:success)
+    end
+  end
 end

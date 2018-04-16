@@ -31,6 +31,6 @@ class Api::V1::CustomEmojisController < Api::BaseController
   end
 
   def set_custom_emoji
-    @custom_emoji = CustomEmoji.find(params[:id])
+    @custom_emoji = CustomEmoji.local.find_by(shortcode: params[:id])
   end
 end
