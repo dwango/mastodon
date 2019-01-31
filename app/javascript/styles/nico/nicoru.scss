@@ -56,10 +56,4 @@ button.icon-button.active i.fa-nicoru {
     @extend .fa-nicoru;
     background-image: url('../images/nicoru-status.svg');
   }
-
-  &--detailed {
-    @extend .fa-nicoru;
-    background-image: url('../images/nicoru-detailed.svg');
-    vertical-align: middle;
-  }
 }
