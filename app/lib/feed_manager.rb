@@ -125,7 +125,7 @@ class FeedManager
 
     loop do
       statuses = Status.as_home_timeline(account)
-                       .paginate_by_max_id(limit, max_id)
+                       .paginate_by_max_id(limit, max_id).where('created_at > ?', 1.month.ago)
 
       break if statuses.empty?
 
