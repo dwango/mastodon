@@ -13,6 +13,12 @@ class Feed
   protected
 
   def from_redis(limit, max_id, since_id, min_id)
+    # 1ヶ月以上前へ遡ろうとする行為を全面的に禁止
+    oldest_id = 1.month.ago.to_i * 1000  << 16
+    max_id = [max_id.to_i, oldest_id].min if max_id.present?
+    since_id = [since_id.to_i, oldest_id].max if since_id.present?
+    min_id = [min_id.to_i, oldest_id].max if min_id.present?
+
     if min_id.blank?
       max_id     = '+inf' if max_id.blank?
       since_id   = '-inf' if since_id.blank?
